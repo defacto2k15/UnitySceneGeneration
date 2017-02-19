@@ -12,9 +12,9 @@ namespace Assets
 
         public void LoadHeightmap(HeightmapFile heightmapFile)
         {
-            int terrainObjectWidth = 100;
-
+            var wholeTerrainWidth = 100000;
             int subTerrainCount = 14;
+            int subterrainWidth = wholeTerrainWidth / subTerrainCount;
 
             heightArrays = new MyTerrain[subTerrainCount, subTerrainCount];
             HeightmapWidth segmentWidth = new HeightmapWidth(256);
@@ -23,11 +23,18 @@ namespace Assets
             {
                 for (int j = subTerrainCount - 1; j >= 0; j--)
                 {
-                    int lodFactor = Math.Min(j + 1, 4);
+                    var lodFactor = 4;
 
                     var segmentHeightmapInFullResolution = heightmapFile.getHeightSubmap(i * segmentWidth.StandardWidth, j * segmentWidth.StandardWidth, segmentWidth.StandardWidth );
-                    var terrain = new MyTerrain(segmentHeightmapInFullResolution, this, i, j, terrainObjectWidth, lodFactor);
-                    terrain.Position = ( new Vector3((i - subTerrainCount / 2) * terrainObjectWidth * 4, 0, (j - subTerrainCount / 2) * terrainObjectWidth * 4));
+                    var simplifiedSegmentHeightmap = segmentHeightmapInFullResolution.simplyfy(lodFactor);
+
+                    var terrain = new MyTerrain(simplifiedSegmentHeightmap, this, i, j);
+
+                    terrain.Position = (new Vector3((i - subTerrainCount/2)*subterrainWidth, 0,
+                        (j - subTerrainCount/2)*subterrainWidth));
+                    terrain.Scale = new Vector3(subterrainWidth, subterrainWidth, subterrainWidth);
+                    terrain.Rotation = new Vector3(0, 90, 0);
+
                     terrain.Name = ("Terrain " + i + " : " + j + " sRes " + terrain.HeightmapWidth);
                     heightArrays[i, j] = terrain;
                 }

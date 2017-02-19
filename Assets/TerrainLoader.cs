@@ -20,10 +20,6 @@ public class TerrainLoader : MonoBehaviour {
 
         MyTotalHeightmap totalHeightmap = new MyTotalHeightmap();
         totalHeightmap.LoadHeightmap(heightmapFile);
-
-        GameObject planeObj = GameObject.CreatePrimitive(PrimitiveType.Plane);
-        planeObj.name = "myTestPlane";
-        PlaneGenerator.createPlaneMeshFilter(planeObj.GetComponent<MeshFilter>(), 1, 1, 16, 16);
     }
 
 

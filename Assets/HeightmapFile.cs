@@ -32,6 +32,7 @@ namespace Assets
                 for (int j = 0; j < mapWidth; j++)
                 {
                     heightData[i, j] = ((float)fileHeightArray[i * mapWidth + j] - (float)fileMinValue) / (float)delta;
+                    //heightData[i, j] = (float)10*i+j / (float)mapWidth*2 * delta;
                 }
             }
         }

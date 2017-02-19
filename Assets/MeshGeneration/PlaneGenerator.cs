@@ -8,15 +8,13 @@ namespace Assets.MeshGeneration
 {
     class PlaneGenerator
     {
-        public static void createPlaneMeshFilter(MeshFilter filter, float length, float width, int resX, int resZ)
+        public static void createPlaneMeshFilter(MeshFilter filter, float length, float width, float[,] heightArray)
         {
             Mesh mesh = filter.mesh;
             mesh.Clear();
 
-            //float length = 1f; todo remove
-            //float width = 1f;
-            //int resX = 2; // 2 minimum
-            //int resZ = 2;
+            int resX = heightArray.GetLength(0);
+            int resZ = heightArray.GetLength(1);
 
             #region Vertices 
             //todo remove regions to refactor to methods when resharper is present!
@@ -29,7 +27,7 @@ namespace Assets.MeshGeneration
                 {
                     // [ -width / 2, width / 2 ]
                     float xPos = ((float)x / (resX - 1) - .5f) * width;
-                    vertices[x + z * resX] = new Vector3(xPos, 0f, zPos);
+                    vertices[x + z * resX] = new Vector3(xPos, heightArray[resX-x-1, z], zPos);
                 }
             }
 
