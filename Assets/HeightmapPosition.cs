@@ -6,36 +6,35 @@ using UnityEngine;
 
 namespace Assets
 {
-    class HeightmapPosition
+    class HeightmapPosition //todo delete
     {
-        private int xPos;
-        private int yPos;
-        private int heightmapSizeWidth;
+        private readonly int _xPos;
+        private readonly int _yPos;
+        private readonly int _heightmapSizeWidth;
+        private readonly int _heightmapSizeHeight;
 
-        public HeightmapPosition(int xPos, int yPos, int heightmapSizeWidth)
+        public HeightmapPosition(int xPos, int yPos, int heightmapSizeWidth, int heightmapSizeHeight)
         {
-            Preconditions.AssertArgumentIs(xPos >= 0 && xPos < heightmapSizeWidth, " xPos must be between 0 and heightmapSizeWidth");
-            Preconditions.AssertArgumentIs(yPos >= 0 && yPos < heightmapSizeWidth, " yPos must be between 0 and heightmapSizeWidth");
-            Preconditions.AssertArgumentIs(MathHelp.IsPowerOfTwo(heightmapSizeWidth), "heightmapSizeWidth must be power of two");
+            Preconditions.Assert(xPos >= 0 && xPos < heightmapSizeWidth, " xPos must be between 0 and heightmapSizeWidth");
+            Preconditions.Assert(yPos >= 0 && yPos < heightmapSizeHeight, " yPos must be between 0 and heightmapSizeHeight");
 
-            this.xPos = xPos;
-            this.yPos = yPos;
-            this.heightmapSizeWidth = heightmapSizeWidth;
+            _xPos = xPos;
+            _yPos = yPos;
+            _heightmapSizeWidth = heightmapSizeWidth;
+            _heightmapSizeHeight = heightmapSizeHeight;
         }
 
-        public HeightmapPosition GetPositionOnOtherHeightmap(int otherHeightmapWidth)
+        public HeightmapPosition GetPositionOnOtherHeightmap(int otherHeightmapWidth, int otherHeightmapHeight)
         {
-            if (otherHeightmapWidth > heightmapSizeWidth)
-            {
-                Debug.Log(" Prawdopodobnie lod jest brany z bardziej skomplikowanej heightmapy do mniej skomplikowanej, to jest blad");
-                return new HeightmapPosition(0,0, otherHeightmapWidth);
-            }
-            int divisor = heightmapSizeWidth / otherHeightmapWidth;
+            Preconditions.Assert(otherHeightmapHeight <= _heightmapSizeHeight, " Prawopodobnie margin jest barny z bardziej skomplikowanej heightmapy do mniej skomplikowanej.");
+            Preconditions.Assert(otherHeightmapWidth <= _heightmapSizeWidth, " Prawopodobnie margin jest barny z bardziej skomplikowanej heightmapy do mniej skomplikowanej.");
+            int xDivisor = _heightmapSizeWidth / otherHeightmapWidth;
+            int yDivisor = _heightmapSizeHeight / otherHeightmapHeight;
 
-            return new HeightmapPosition((int)Math.Floor((decimal)(xPos / divisor)), (int)Math.Floor((decimal)(yPos / divisor)), otherHeightmapWidth);
+            return new HeightmapPosition((int)Math.Floor((double)_xPos / xDivisor), (int)Math.Floor((double)_yPos / yDivisor), otherHeightmapWidth, otherHeightmapHeight);
         }
 
-        public int X { get { return xPos; } }
-        public int Y { get { return yPos; } }
+        public int X { get { return _xPos; } }
+        public int Y { get { return _yPos; } }
     }
 }

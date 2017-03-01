@@ -22,12 +22,12 @@ namespace Assets.MeshGeneration
             for (int z = 0; z < resZ; z++)
             {
                 // [ -length / 2, length / 2 ]
-                float zPos = ((float)z / (resZ - 1) - .5f) * length;
+                float zPos = ((float)z / (resZ - 1) ) * length;
                 for (int x = 0; x < resX; x++)
                 {
                     // [ -width / 2, width / 2 ]
-                    float xPos = ((float)x / (resX - 1) - .5f) * width;
-                    vertices[x + z * resX] = new Vector3(xPos, heightArray[resX-x-1, z], zPos);
+                    float xPos = ((float)x / (resX - 1) ) * width;
+                    vertices[x + z * resX] = new Vector3(xPos, heightArray[x, z], zPos);
                 }
             }
 
@@ -54,7 +54,7 @@ namespace Assets.MeshGeneration
             for (int face = 0; face < nbFaces; face++)
             {
                 // Retrieve lower left corner from face ind
-                int i = face % (resX - 1) + (face / (resZ - 1) * resX);
+                int i = face % (resX - 1) + (face / (resX - 1) * resX);
 
                 triangles[t++] = i + resX;
                 triangles[t++] = i + 1;

@@ -7,7 +7,7 @@ namespace Assets
 {
     static class Preconditions
     {
-        public static void AssertArgumentIs( bool valueToCheck, string failureMessage ){
+        public static void Assert( bool valueToCheck, string failureMessage ){
             if (!valueToCheck)
             {
                 throw new ArgumentException(failureMessage);
