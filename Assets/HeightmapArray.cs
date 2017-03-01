@@ -89,7 +89,7 @@ namespace Assets
 
         public HeightmapMargin GetRightMargin()
         {
-            return GetMargin((i)=> _array[WorkingWidth - 1,i], Height);
+            return GetMargin((i)=> _array[WorkingWidth ,i], Height);
         }
 
         public HeightmapMargin GetDownMargin()
@@ -99,7 +99,7 @@ namespace Assets
 
         public HeightmapMargin GetTopMargin()
         {
-            return GetMargin((i)=> _array[i,WorkingHeight - 1], Width);
+            return GetMargin((i)=> _array[i,WorkingHeight ], Width);
         }
 
         private HeightmapMargin GetMargin(Func<int, float> elementGetter, int marginLength)

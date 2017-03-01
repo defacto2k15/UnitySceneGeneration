@@ -27,25 +27,27 @@ public class TerrainLoader : MonoBehaviour {
         int minSubmapWidth = (int)Math.Floor((double)filePixelWidth/subTerrainCount) ;
         List<SubmapInfo> submapInfos = new List<SubmapInfo>
         {
-//            newSubmapDimension(0,0,2,1,minSubmapWidth/4, 1),
-            //newSubmapDimension(0,0,4,4,minSubmapWidth, 6),
+    //        newSubmapDimension(2,2,2,2,minSubmapWidth, 4),
+
+
+            newSubmapDimension(0,0,4,4,minSubmapWidth, 6),
             newSubmapDimension(0,4,4,6,minSubmapWidth, 7),
-            //newSubmapDimension(4,0,6,4,minSubmapWidth, 5), //todo delete
-            //newSubmapDimension(0,10,4,4,minSubmapWidth, 4),
+            newSubmapDimension(4,0,6,4,minSubmapWidth, 5), //todo delete
+            newSubmapDimension(0,10,4,4,minSubmapWidth, 4),
             newSubmapDimension(4,4,2,2,minSubmapWidth, 2+4),
-            //newSubmapDimension(4,6,2,2,minSubmapWidth, 2+4),
-            //newSubmapDimension(4,8,2,2,minSubmapWidth, 2+4),
-            //newSubmapDimension(6,4,2,2,minSubmapWidth, 2+4),
-            //newSubmapDimension(6,8,2,2,minSubmapWidth, 2+4),
-            //newSubmapDimension(6,8,2,2,minSubmapWidth, 2+4),
-            //newSubmapDimension(8,4,2,2,minSubmapWidth, 2+4),
-            //newSubmapDimension(8,6,2,2,minSubmapWidth, 2+4),
-            //newSubmapDimension(8,8,2,2,minSubmapWidth, 2+4),
-            //newSubmapDimension(6,6,2,2,minSubmapWidth, 2+4),
-            //newSubmapDimension(10,4,4,6,minSubmapWidth, 3+2),
-            //newSubmapDimension(10,10,4,4,minSubmapWidth, 4+1),
-            //newSubmapDimension(4,10,6,4,minSubmapWidth, 3+4),
-            //newSubmapDimension(10,0,4,4,minSubmapWidth, 3+4),
+            newSubmapDimension(4,6,2,2,minSubmapWidth, 2+4),
+            newSubmapDimension(4,8,2,2,minSubmapWidth, 2+4),
+            newSubmapDimension(6,4,2,2,minSubmapWidth, 2+4),
+            newSubmapDimension(6,8,2,2,minSubmapWidth, 2+4),
+            newSubmapDimension(6,8,2,2,minSubmapWidth, 2+4),
+            newSubmapDimension(8,4,2,2,minSubmapWidth, 2+4),
+            newSubmapDimension(8,6,2,2,minSubmapWidth, 2+4),
+            newSubmapDimension(8,8,2,2,minSubmapWidth, 2+4),
+            newSubmapDimension(6,6,2,2,minSubmapWidth, 2+4),
+            newSubmapDimension(10,4,4,6,minSubmapWidth, 3+2),
+            newSubmapDimension(10,10,4,4,minSubmapWidth, 4+1),
+            newSubmapDimension(4,10,6,4,minSubmapWidth, 3+4),
+            newSubmapDimension(10,0,4,4,minSubmapWidth, 3+4),
 
 
             //newSubmapDimension(0,0,1,1,minSubmapWidth, 1),

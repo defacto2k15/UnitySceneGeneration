@@ -69,7 +69,7 @@
     <Compile Include="Assets\HeightmapArray.cs" />
     <Compile Include="Assets\HeightmapFile.cs" />
     <Compile Include="Assets\HeightmapMargin.cs" />
-    <Compile Include="Assets\HeightmapMarginWithPosition.cs" />
+    <Compile Include="Assets\HeightmapMarginWithInfo.cs" />
     <Compile Include="Assets\HeightmapPosition.cs" />
     <Compile Include="Assets\MathHelp.cs" />
     <Compile Include="Assets\MeshGeneration\PlaneGenerator.cs" />

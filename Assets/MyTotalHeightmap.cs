@@ -47,7 +47,9 @@ namespace Assets
                     var ourDownMargin = aHeightmapPair.GetLeftMargin();
                     foreach (var neighbourPair in leftNeighbours)
                     {
-                        var marginAfterLod = ourDownMargin.SetLength(neighbourPair.HeightmapArray.WorkingHeight);
+                        var marginAfterLod = ourDownMargin.SetLod(neighbourPair.SubmapInfo.LodFactor);
+                        var hisOldMargin = neighbourPair.GetRightMargin(); //todo remove debug
+                        var hisNewMargin = neighbourPair.GetRightMargin().UpdateWherePossible(marginAfterLod);
                         neighbourPair.SetRightMargin(neighbourPair.GetRightMargin().UpdateWherePossible(marginAfterLod));
                         if (aHeightmapPair.SubmapInfo.LodFactor >= neighbourPair.SubmapInfo.LodFactor) // we have bigger lod
                         {
@@ -55,7 +57,7 @@ namespace Assets
                         }
                         else // neighbour has bigger lod
                         {
-                            var unLoddedMargin = marginAfterLod.SetLength(aHeightmapPair.HeightmapArray.WorkingHeight);
+                            var unLoddedMargin = marginAfterLod.SetLod(aHeightmapPair.SubmapInfo.LodFactor);
                             aHeightmapPair.SetLeftMargin(unLoddedMargin); // we have to make our margin with less resolution
                         }
                     }
@@ -68,7 +70,7 @@ namespace Assets
                     var ourDownMargin = aHeightmapPair.GetDownMargin();
                     foreach (var neighbourPair in downNeighbours)
                     {
-                        var marginAfterLod = ourDownMargin.SetLength(neighbourPair.HeightmapArray.WorkingWidth);
+                        var marginAfterLod = ourDownMargin.SetLod(neighbourPair.SubmapInfo.LodFactor);
                         neighbourPair.SetTopMargin(neighbourPair.GetTopMargin().UpdateWherePossible(marginAfterLod));
                         if (aHeightmapPair.SubmapInfo.LodFactor >= neighbourPair.SubmapInfo.LodFactor) // we have bigger lod
                         {
@@ -76,7 +78,7 @@ namespace Assets
                         }
                         else // neighbour has bigger lod
                         {
-                            var unLoddedMargin = marginAfterLod.SetLength(aHeightmapPair.HeightmapArray.WorkingWidth); //todo lodding destroys correction in touch points with arleady seamed margins
+                            var unLoddedMargin = marginAfterLod.SetLod(aHeightmapPair.SubmapInfo.LodFactor); //todo lodding destroys correction in touch points with arleady seamed margins
                             aHeightmapPair.SetBottomMargin(unLoddedMargin); // we have to make our margin with less resolution
                         }
                     }
@@ -121,45 +123,45 @@ namespace Assets
             HeightmapArray = heightmapArray;
         }
 
-        public HeightmapMarginWithPosition GetDownMargin()
+        public HeightmapMarginWithInfo GetDownMargin()
         {
-            return new HeightmapMarginWithPosition(HeightmapArray.GetDownMargin(), new MarginPosition(SubmapInfo.DownLeftPoint, SubmapInfo.DownRightPoint) );
+            return new HeightmapMarginWithInfo(HeightmapArray.GetDownMargin(), new MarginPosition(SubmapInfo.DownLeftPoint, SubmapInfo.DownRightPoint), SubmapInfo.LodFactor );
         }
 
-        public HeightmapMarginWithPosition GetTopMargin()
+        public HeightmapMarginWithInfo GetTopMargin()
         {
-            return new HeightmapMarginWithPosition(HeightmapArray.GetTopMargin(), new MarginPosition(SubmapInfo.TopLeftPoint, SubmapInfo.TopRightPoint ));
+            return new HeightmapMarginWithInfo(HeightmapArray.GetTopMargin(), new MarginPosition(SubmapInfo.TopLeftPoint, SubmapInfo.TopRightPoint ), SubmapInfo.LodFactor);
         }
 
-        public HeightmapMarginWithPosition GetLeftMargin()
+        public HeightmapMarginWithInfo GetLeftMargin()
         {
-            return new HeightmapMarginWithPosition(HeightmapArray.GetLeftMargin(), new MarginPosition(SubmapInfo.DownLeftPoint, SubmapInfo.TopLeftPoint ));
+            return new HeightmapMarginWithInfo(HeightmapArray.GetLeftMargin(), new MarginPosition(SubmapInfo.DownLeftPoint, SubmapInfo.TopLeftPoint ), SubmapInfo.LodFactor);
         }
 
-        public HeightmapMarginWithPosition GetRightMargin()
+        public HeightmapMarginWithInfo GetRightMargin()
         {
-            return new HeightmapMarginWithPosition(HeightmapArray.GetRightMargin(), new MarginPosition(SubmapInfo.DownRightPoint, SubmapInfo.TopRightPoint ));
+            return new HeightmapMarginWithInfo(HeightmapArray.GetRightMargin(), new MarginPosition(SubmapInfo.DownRightPoint, SubmapInfo.TopRightPoint ), SubmapInfo.LodFactor);
         }
 
-        public void SetRightMargin(HeightmapMarginWithPosition margin)
+        public void SetRightMargin(HeightmapMarginWithInfo margin)
         {
             Preconditions.Assert(margin.Position.IsVertical, string.Format("Right margin {0} cant be set as is not vertical",margin ));
             HeightmapArray.SetRightMargin(margin.HeightmapMargin);
         }
 
-        public void SetLeftMargin(HeightmapMarginWithPosition margin)
+        public void SetLeftMargin(HeightmapMarginWithInfo margin)
         {
             Preconditions.Assert(margin.Position.IsVertical, string.Format("Left margin {0} cant be set as is not vertical",margin ));
             HeightmapArray.SetLeftMargin(margin.HeightmapMargin);
         }
 
-        public void SetTopMargin(HeightmapMarginWithPosition margin)
+        public void SetTopMargin(HeightmapMarginWithInfo margin)
         {
             Preconditions.Assert(margin.Position.IsHorizontal, string.Format("Top margin {0} cant be set as is not horizontal",margin ));
             HeightmapArray.SetTopMargin(margin.HeightmapMargin);
         }
 
-        public void SetBottomMargin(HeightmapMarginWithPosition margin)
+        public void SetBottomMargin(HeightmapMarginWithInfo margin)
         {
             Preconditions.Assert(margin.Position.IsHorizontal, string.Format("Bottom margin {0} cant be set as is not horizontal",margin ));
             HeightmapArray.SetBottomMargin(margin.HeightmapMargin);
