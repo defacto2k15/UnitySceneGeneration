@@ -33,6 +33,7 @@ namespace Assets
                 {
                     newValues[i] = _marginValues.Skip(i*newPointSize).Take(newPointSize).Sum() / newPointSize; //average
                 }
+                newValues[newWorkingLength] = _marginValues[WorkingLength];
                 return new HeightmapMargin( newValues);
             } else if (WorkingLength < newWorkingLength)
             {
@@ -47,6 +48,7 @@ namespace Assets
                             (float) j/newPointSize);
                     }
                 }
+                newValues[newWorkingLength] = _marginValues[WorkingLength];
                 return new HeightmapMargin( newValues);
             }
             return new HeightmapMargin( _marginValues);

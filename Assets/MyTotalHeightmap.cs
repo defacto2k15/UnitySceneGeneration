@@ -13,7 +13,7 @@ namespace Assets
         // todo: choose to use submap or subterrain
         public void LoadHeightmap(HeightmapFile heightmapFile, List<SubmapInfo> submapInfos, int baseInUnityLength, int totalMapWidthInBaseUnits)
         {
-            var wholeTerrainWidth = 100000;
+            //var wholeTerrainWidth = 100000;
 
             var submapAndHeightmapArrayList
                 = (from info in submapInfos
@@ -23,6 +23,7 @@ namespace Assets
                     select new SubmapInfoAndHeightmapArray(info, submap)).ToList();
 
             SetSubmapMargins(submapAndHeightmapArrayList);
+            SetSubmapApexPoint(submapAndHeightmapArrayList);
 
             Submaps = new List<MyTerrain>();
             foreach (var aPair  in submapAndHeightmapArrayList)
@@ -48,8 +49,6 @@ namespace Assets
                     foreach (var neighbourPair in leftNeighbours)
                     {
                         var marginAfterLod = ourDownMargin.SetLod(neighbourPair.SubmapInfo.LodFactor);
-                        var hisOldMargin = neighbourPair.GetRightMargin(); //todo remove debug
-                        var hisNewMargin = neighbourPair.GetRightMargin().UpdateWherePossible(marginAfterLod);
                         neighbourPair.SetRightMargin(neighbourPair.GetRightMargin().UpdateWherePossible(marginAfterLod));
                         if (aHeightmapPair.SubmapInfo.LodFactor >= neighbourPair.SubmapInfo.LodFactor) // we have bigger lod
                         {
@@ -86,6 +85,24 @@ namespace Assets
             }
         }
 
+        private void SetSubmapApexPoint(List<SubmapInfoAndHeightmapArray> heightmaps )
+        {
+            foreach (var aHeightmapPair in heightmaps)
+            {
+                if (aHeightmapPair.SubmapInfo.DownLeftX != 0)
+                {
+                    ApexPointData downLeftSubmapApexPoint = getApexPointAt(aHeightmapPair.SubmapInfo.DownLeftPoint, heightmaps);
+                    downLeftSubmapApexPoint.IntegrateApexPoint();
+                }
+
+                if (aHeightmapPair.SubmapInfo.DownLeftY != 0)
+                {
+                    var downLeftSubmapApexPoint = getApexPointAt(aHeightmapPair.SubmapInfo.DownRightPoint, heightmaps);
+                    downLeftSubmapApexPoint.IntegrateApexPoint();
+                }
+            }
+        }
+
         private IEnumerable<SubmapInfoAndHeightmapArray> getBottomNeighbours(SubmapInfo info, List<SubmapInfoAndHeightmapArray> heightmaps)
         {
             var hh = heightmaps[0];
@@ -105,12 +122,35 @@ namespace Assets
                     select heightmap).ToList();
         }
 
+        private ApexPointData getApexPointAt(Point2D apexPoint, List<SubmapInfoAndHeightmapArray> heightmaps)
+        {
+            var downLeftSubmap = from heightmap in heightmaps
+                                where heightmap.SubmapInfo.DownRightPoint.X == apexPoint.X
+                                      && (heightmap.SubmapInfo.DownRightPoint.Y) < apexPoint.Y &&
+                                      (heightmap.SubmapInfo.TopRightPoint.Y) >= apexPoint.Y
+                                select heightmap;
+            var topLeftSubmap = from heightmap in heightmaps
+                                where heightmap.SubmapInfo.DownRightPoint.X == apexPoint.X
+                                      && (heightmap.SubmapInfo.DownRightPoint.Y) <= apexPoint.Y &&
+                                      (heightmap.SubmapInfo.TopRightPoint.Y) > apexPoint.Y
+                                select heightmap;
 
-        //public float GetHeight(int terrainXPos, int terrainYPos, HeightmapPosition position) //todo
-        //{
-        //    return heightArrays[terrainXPos, terrainYPos].GetHeight(position);
-        //}
+            var downRightSubmap = from heightmap in heightmaps
+                                 where heightmap.SubmapInfo.DownLeftPoint.X == apexPoint.X
+                                       && (heightmap.SubmapInfo.DownLeftPoint.Y) < apexPoint.Y &&
+                                       (heightmap.SubmapInfo.TopLeftPoint.Y) >= apexPoint.Y
+                                 select heightmap;
+            var topRightSubmap = from heightmap in heightmaps
+                                 where heightmap.SubmapInfo.DownLeftPoint.X == apexPoint.X
+                                      && (heightmap.SubmapInfo.DownLeftPoint.Y) <= apexPoint.Y &&
+                                      (heightmap.SubmapInfo.TopLeftPoint.Y) > apexPoint.Y
+                                select heightmap;
+            return new ApexPointData(apexPoint, downLeftSubmap.FirstOrDefault(), downRightSubmap.FirstOrDefault(),
+                topLeftSubmap.FirstOrDefault(), topRightSubmap.FirstOrDefault());
+        }
+
     }
+
 
     internal class SubmapInfoAndHeightmapArray
     {
@@ -165,6 +205,111 @@ namespace Assets
         {
             Preconditions.Assert(margin.Position.IsHorizontal, string.Format("Bottom margin {0} cant be set as is not horizontal",margin ));
             HeightmapArray.SetBottomMargin(margin.HeightmapMargin);
+        }
+
+        public float GetApexHeight(Point2D apexPoint)
+        {
+            if (Equals(apexPoint, SubmapInfo.DownLeftPoint))
+            {
+                return HeightmapArray.GetHeight(0, 0);
+            } 
+            else if (Equals(apexPoint, SubmapInfo.DownRightPoint))
+            {
+                return HeightmapArray.GetHeight( HeightmapArray.WorkingWidth,0);
+            } 
+            else if (Equals(apexPoint, SubmapInfo.TopLeftPoint))
+            {
+                return HeightmapArray.GetHeight(0, HeightmapArray.WorkingHeight);
+            }
+            else if (Equals(apexPoint, SubmapInfo.TopRightPoint))
+            {
+                return HeightmapArray.GetHeight(HeightmapArray.WorkingWidth, HeightmapArray.WorkingHeight);
+            }
+            else
+            {
+                Preconditions.Fail(string.Format("Point {0} is not apex point", apexPoint));
+                return -22; //not used
+            }
+        }
+
+        public void SetApexHeight(Point2D apexPoint, float value, int lod)
+        {
+            Preconditions.Assert(lod >= SubmapInfo.LodFactor, "Cant set apex height. Lod factor is too small");
+            var pixelSize = (int)Math.Pow(2, lod - SubmapInfo.LodFactor);
+            if (Equals(apexPoint, SubmapInfo.DownLeftPoint))
+            {
+                HeightmapArray.SetDownLeftApexMarginHeight( value, pixelSize); 
+            }
+            else if (Equals(apexPoint, SubmapInfo.DownRightPoint))
+            {
+                HeightmapArray.SetDownRightApexMarginHeight(value, pixelSize);
+            }
+            else if (Equals(apexPoint, SubmapInfo.TopLeftPoint))
+            {
+                HeightmapArray.SetTopLeftApexMarginHeight( value, pixelSize);
+            }
+            else if (Equals(apexPoint, SubmapInfo.TopRightPoint))
+            {
+                HeightmapArray.SetTopRightApexMarginHeight( value, pixelSize);
+            }
+            else
+            {
+                Preconditions.Fail(string.Format("Point {0} is not apex point", apexPoint));
+            }
+        }
+
+        public float GetHeight(Point2D apexPoint)
+        {
+            Preconditions.Assert(SubmapInfo.IsPointPartOfSubmap(apexPoint), String.Format("Point {0} is not part of submap ", apexPoint));
+            int globalOffsetX = apexPoint.X - SubmapInfo.DownLeftX;
+            int globalOffsetY = apexPoint.Y - SubmapInfo.DownLeftY;
+            int offsetX = (int)(HeightmapArray.WorkingWidth * Mathf.InverseLerp(0, SubmapInfo.Width, globalOffsetX));
+            int offsetY = (int)(HeightmapArray.WorkingHeight * Mathf.InverseLerp(0, SubmapInfo.Height, globalOffsetY));
+            return HeightmapArray.GetHeight(offsetX, offsetY);
+        }
+    }
+
+
+    internal class ApexPointData
+    {
+        private readonly Point2D _apexPoint;
+        private readonly SubmapInfoAndHeightmapArray _downLeft;
+        private readonly SubmapInfoAndHeightmapArray _downRight;
+        private readonly SubmapInfoAndHeightmapArray _topLeft;
+        private readonly SubmapInfoAndHeightmapArray _topRight;
+
+        public ApexPointData(Point2D apexPoint, SubmapInfoAndHeightmapArray downLeft, SubmapInfoAndHeightmapArray downRight, 
+            SubmapInfoAndHeightmapArray topLeft, SubmapInfoAndHeightmapArray topRight)
+        {
+            _apexPoint = apexPoint;
+            _downLeft = downLeft;
+            _downRight = downRight;
+            _topLeft = topLeft;
+            _topRight = topRight;
+        }
+
+        public void IntegrateApexPoint()
+        {
+            var allSubmaps = (new List<SubmapInfoAndHeightmapArray> {_downLeft, _downRight, _topLeft, _topRight}).Where(x => x != null).ToList();
+            if (allSubmaps.Count != 0)
+            {
+                var highestPointValue =
+                    allSubmaps.Where(x => x.SubmapInfo.IsApexPoint(_apexPoint))
+                        .Select(x => x.GetApexHeight(_apexPoint))
+                        .Union(
+                            allSubmaps.Where(x => !x.SubmapInfo.IsApexPoint(_apexPoint))
+                                .Select(x => x.GetHeight(_apexPoint)))
+                        .OrderByDescending(x => x).First();
+
+                var biggestLod = allSubmaps.Select(x => x.SubmapInfo.LodFactor).OrderByDescending(x => x).First();
+                foreach (var subMap in allSubmaps)
+                {
+                    if (subMap.SubmapInfo.IsApexPoint(_apexPoint))
+                    {
+                        subMap.SetApexHeight(_apexPoint, highestPointValue, biggestLod);
+                    }
+                }
+            }
         }
     }
 }

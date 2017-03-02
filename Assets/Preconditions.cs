@@ -10,8 +10,13 @@ namespace Assets
         public static void Assert( bool valueToCheck, string failureMessage ){
             if (!valueToCheck)
             {
-                throw new ArgumentException(failureMessage);
+                Fail(failureMessage);
             }
+        }
+
+        public static void Fail(string failureMessage)
+        {
+            throw new ArgumentException(failureMessage);
         }
     }
 }

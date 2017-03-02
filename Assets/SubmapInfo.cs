@@ -68,5 +68,17 @@ namespace Assets
                 return new Point2D(DownLeftX+Width, DownLeftY+Height);
             }
         }
+
+        public bool IsApexPoint(Point2D apexPoint)
+        {
+            return Equals(TopLeftPoint, apexPoint) || Equals(TopRightPoint, apexPoint) || Equals(DownLeftPoint, apexPoint) ||
+                   Equals(DownRightPoint, apexPoint);
+        }
+
+        public bool IsPointPartOfSubmap(Point2D point)
+        {
+            return point.X >= DownLeftPoint.X && point.X <= DownRightPoint.X && point.Y >= DownLeftPoint.Y &&
+                   point.Y <= TopLeftPoint.Y;
+        }
     }
 }
