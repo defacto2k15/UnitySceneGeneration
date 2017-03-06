@@ -75,6 +75,7 @@
     <Compile Include="Assets\HeightmapMarginWithInfo.cs" />
     <Compile Include="Assets\HeightmapPosition.cs" />
     <Compile Include="Assets\MathHelp.cs" />
+    <Compile Include="Assets\MeshGeneration\MeshGenerationUtils.cs" />
     <Compile Include="Assets\MeshGeneration\PlaneGenerator.cs" />
     <Compile Include="Assets\MyTerrain.cs" />
     <Compile Include="Assets\MyTotalHeightmap.cs" />
