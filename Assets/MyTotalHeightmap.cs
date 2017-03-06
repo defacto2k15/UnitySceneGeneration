@@ -105,9 +105,6 @@ namespace Assets
 
         private IEnumerable<SubmapInfoAndHeightmapArray> getBottomNeighbours(SubmapInfo info, List<SubmapInfoAndHeightmapArray> heightmaps)
         {
-            var hh = heightmaps[0];
-            var mh = MathHelp.SegmentsHaveCommonElement(hh.SubmapInfo.TopLeftPoint.X, hh.SubmapInfo.TopRightPoint.X,
-                info.DownLeftPoint.X, info.DownRightPoint.X);
             return (from heightmap in heightmaps 
                     where heightmap.SubmapInfo.DownLeftY + heightmap.SubmapInfo.Height == info.DownLeftY &&
                         MathHelp.SegmentsHaveCommonElement( heightmap.SubmapInfo.TopLeftPoint.X, heightmap.SubmapInfo.TopRightPoint.X, info.DownLeftPoint.X, info.DownRightPoint.X)

@@ -65,6 +65,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Grass\GrassGeneratorObj.cs" />
+    <Compile Include="Assets\Grass\GrassMeshGenerator.cs" />
+    <Compile Include="Assets\Grass\GrassTuft.cs" />
+    <Compile Include="Assets\Grass\GrassTuftGenerator.cs" />
     <Compile Include="Assets\HeightmapArray.cs" />
     <Compile Include="Assets\HeightmapFile.cs" />
     <Compile Include="Assets\HeightmapMargin.cs" />
@@ -80,7 +84,6 @@
     <Compile Include="Assets\SubmapInfo.cs" />
     <Compile Include="Assets\SubmapPlane.cs" />
     <Compile Include="Assets\TerrainLoader.cs" />
-    <Compile Include="Assets\TerritoryPosition.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2012\UnityVS.CSharp.targets" />
 </Project>

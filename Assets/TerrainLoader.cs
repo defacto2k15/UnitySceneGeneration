@@ -9,12 +9,10 @@ using Assets;
 using Assets.MeshGeneration;
 
 public class TerrainLoader : MonoBehaviour {
-    GameObject terrainGameObject;
 
 	// Use this for initialization
     void Start()
     {
-
         string bilFilePath = @"C:\n49_e019_1arc_v3.bil";
         HeightmapFile heightmapFile = new HeightmapFile();
         const int filePixelWidth = 3601;
@@ -62,9 +60,7 @@ public class TerrainLoader : MonoBehaviour {
 
 
         };
-        float[,] heightFloats = new float[6, 4];
         //SubmapPlane.CreatePlaneObject(heightFloats);
-        Func<int, int, int> lodLevelEvaluator = (x, y) => Math.Min( Math.Abs(subTerrainCount/2 - x), Math.Abs(subTerrainCount/2 - y) ) + 1;
         totalHeightmap.LoadHeightmap(heightmapFile, submapInfos, minSubmapWidth, subTerrainCount );
     }
 
@@ -72,29 +68,6 @@ public class TerrainLoader : MonoBehaviour {
     {
         return new SubmapInfo(x*distanceBase, y*distanceBase, width * distanceBase, height * distanceBase, lodFactor);
     }
-
-
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKey(KeyCode.W))
-        {
-            terrainGameObject.transform.position += Vector3.forward;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            terrainGameObject.transform.position += Vector3.right;
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            terrainGameObject.transform.position += Vector3.left;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            terrainGameObject.transform.position += Vector3.down;
-        }
-	}
 }
 
 public class HeightmapWidth
