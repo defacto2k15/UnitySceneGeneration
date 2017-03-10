@@ -9,20 +9,14 @@ namespace Assets.Grass
 {
     class GrassTuftGenerator
     {
-        public static GrassTuft CreateGrassTuft()
+        GrassMeshGenerator generator = new GrassMeshGenerator();
+
+        public  GrassTuft CreateGrassTuft(Material material)
         {
-            var tuftObj = new GameObject {name = "grassTuft"};
-            GrassMeshGenerator.GenerateGrassBladeMesh(tuftObj.AddComponent<MeshFilter>());
+            //var tuftObj = new GameObject {name = "grassTuft"};
+            Mesh mesh = generator.GetGrassBladeMesh(2);
 
-            var renderer = tuftObj.AddComponent<MeshRenderer>();
-            renderer.material.shader = Shader.Find("Particles/Additive");
-            Texture2D tex = new Texture2D(1, 1);
-            tex.SetPixel(0, 0, Color.green);
-            tex.Apply();
-            renderer.material.mainTexture = tex;
-            renderer.material.color = Color.green;
-
-            return new GrassTuft(tuftObj);
+            return new GrassTuft(mesh);
         }
     }
 }

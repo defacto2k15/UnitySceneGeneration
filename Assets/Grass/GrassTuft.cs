@@ -4,11 +4,13 @@ namespace Assets.Grass
 {
     internal class GrassTuft
     {
-        private readonly GameObject _tuftObj;
+        private readonly Mesh mesh;
 
-        public GrassTuft(GameObject tuftObj)
+        public GrassTuft(Mesh mesh)
         {
-            _tuftObj = tuftObj;
+            this.mesh = mesh;
         }
+
+        public Vector3 Position { get; set; }
     }
 }

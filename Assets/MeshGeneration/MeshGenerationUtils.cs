@@ -15,8 +15,8 @@ namespace Assets.MeshGeneration
             for (var i = 0; i < oldTriangles.Length/3; i++)
             {
                 newTriangles[oldTriangles.Length + i*3] = oldTriangles[i*3];
-                newTriangles[oldTriangles.Length + i*3+1] = oldTriangles[i*3+1];
-                newTriangles[oldTriangles.Length + i*3+2] = oldTriangles[i*3+2];
+                newTriangles[oldTriangles.Length + i*3+1] = oldTriangles[i*3+2];
+                newTriangles[oldTriangles.Length + i*3+2] = oldTriangles[i*3+1];
             }
             return newTriangles;
         }

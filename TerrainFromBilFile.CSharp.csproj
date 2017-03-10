@@ -13,13 +13,11 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile>
-    </CompilerResponseFile>
+    <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.4.2f2</UnityVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -74,6 +72,7 @@
     <Compile Include="Assets\HeightmapMargin.cs" />
     <Compile Include="Assets\HeightmapMarginWithInfo.cs" />
     <Compile Include="Assets\HeightmapPosition.cs" />
+    <Compile Include="Assets\MarginPosition.cs" />
     <Compile Include="Assets\MathHelp.cs" />
     <Compile Include="Assets\MeshGeneration\MeshGenerationUtils.cs" />
     <Compile Include="Assets\MeshGeneration\PlaneGenerator.cs" />
@@ -81,10 +80,16 @@
     <Compile Include="Assets\MyTotalHeightmap.cs" />
     <Compile Include="Assets\Point2D.cs" />
     <Compile Include="Assets\Preconditions.cs" />
-    <Compile Include="Assets\MarginPosition.cs" />
     <Compile Include="Assets\SubmapInfo.cs" />
     <Compile Include="Assets\SubmapPlane.cs" />
     <Compile Include="Assets\TerrainLoader.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\shaders\instanced.shader" />
+    <None Include="Assets\shaders\myShader1.shader" />
+    <None Include="Assets\shaders\myShader2.shader" />
+    <None Include="Assets\shaders\myShader3GlobalStates.shader" />
+    <None Include="Assets\shaders\testSurfaceShader.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2012\UnityVS.CSharp.targets" />
 </Project>
