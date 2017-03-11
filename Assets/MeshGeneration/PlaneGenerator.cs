@@ -73,7 +73,7 @@ namespace Assets.MeshGeneration
 
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
-            mesh.Optimize();
+            ;
         }
     }
 }

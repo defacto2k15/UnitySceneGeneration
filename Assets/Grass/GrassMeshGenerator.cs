@@ -73,7 +73,7 @@ namespace Assets.Grass
 
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
-            mesh.Optimize();
+            ;
             return mesh;
         }
 
