@@ -11,12 +11,12 @@ namespace Assets.Grass
     {
         GrassMeshGenerator generator = new GrassMeshGenerator();
 
-        public  GrassTuft CreateGrassTuft(Material material)
+        public  GrassInstance CreateGrassTuft(Material material)
         {
             //var tuftObj = new GameObject {name = "grassTuft"};
             Mesh mesh = generator.GetGrassBladeMesh(2);
 
-            return new GrassTuft(mesh);
+            return new GrassInstance(mesh);
         }
     }
 }

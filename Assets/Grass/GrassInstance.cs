@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace Assets.Grass
 {
-    internal class GrassTuft
+    internal class GrassInstance
     {
         private readonly Mesh mesh;
         private Matrix4x4 _localToWorldMatrix;
         private Vector3 _position;
 
-        public GrassTuft(Mesh mesh)
+        public GrassInstance(Mesh mesh)
         {
             this.mesh = mesh;
         }

@@ -3,10 +3,10 @@
 		_Color ("Color", Color) = (1,1,1,1)
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness ("Smoothness", Range(0,1)) = 0.5
-		_BendingStrength ("BendingStrength", Range(-1,1)) = 0.0
+		_BendingStrength ("BendingStrength", Range(0,1)) = 0.0
 		_InitialBendingVal ("InitialBendingValue", Range(-1, 1)) = 0.0
 		_PlantBendingStiffness("PlantBendingStiffness", Range(0,1)) = 0.5
-		_DirectionData("WindDirection", Vector) = (0.0,0.0, 0.0, 0.0)
+		_WindDirection("WindDirection", Vector) = (0.0,0.0, 0.0, 0.0)
 		_PlantDirection("PlantDirection", Vector) = (0.0,0.0, 0.0, 0.0)
 	}
 	SubShader {
@@ -39,6 +39,16 @@
 			return 3.14;
 		}
 
+		half rand(half seed)
+		{
+			return frac(sin( seed ) * 43758.5453);
+		}
+
+		// zwraca od 0 do 1
+		half noise1D( half seed ){
+			return lerp(rand(floor(seed)), rand(ceil(seed)), frac(seed)); 
+		}
+
 		half stiffnesInternalFunc( half x){
 			half a = lerp(0.15, 0.7, _PlantBendingStiffness);
 			return (pow(sin(x*fPI()*0.5),a*2))+1;
@@ -59,55 +69,95 @@
 
 		half generateDirectionCoef( half4 windDirection, half4 plantDirection){
 			half cosVal = dot(normalize(windDirection.xy),normalize(plantDirection.xy));
-			return remap(cosVal);
+			return(cosVal);
 		}
 
-		float bendStrength( half inWindValue, half4 windDirection, half4 plantDirection ){
-			const half minStrength = 0.1;
-			const half maxStrength = 0.9;
-
+		// inWindValue - value from 0 to 1
+		// returns value from 0 to 1
+		float calculateXBendStrength( half inWindValue, half4 windDirection, half4 plantDirection ){
 			half normalizedInitialBendingVal =  remap(_InitialBendingVal);
 
 			half initialBendingPowCoefficient = 0.5 - 1.6*normalizedInitialBendingVal + 9*normalizedInitialBendingVal*normalizedInitialBendingVal;
 
-			half normalized = remap(inWindValue);
+			half directionCoefficient = generateDirectionCoef( windDirection, plantDirection);
+			half normalized = remap(inWindValue * directionCoefficient);
+			// now normalized has value from -1 to 1, which also sets the direction of bend
+
 			half val = pow( cos( 3.14*(normalized*1.2-0.2-1)/2.4),initialBendingPowCoefficient);
 			half valueAfterStiffnessComputation = stiffnessFactor(val );
 
-			half directionCoefficient = generateDirectionCoef( windDirection, plantDirection);
+			const half minStrength = 0.1;
+			const half maxStrength = 0.9;
+			return lerp(minStrength, maxStrength,valueAfterStiffnessComputation  );
+		}
 
-			return lerp(minStrength, maxStrength,valueAfterStiffnessComputation ) * directionCoefficient;
+		// inWindValue - value from 0 to 1
+		// returns value from 0 to 1
+		float calculateYBendStrength( half inWindValue, half4 windDirection, half4 plantDirection ){
+			half directionCoefficient = sqrt(generateDirectionCoef( windDirection, plantDirection.yxzw)); //rotated as we check if wind is blowing on side
+			half normalized = remap(inWindValue * directionCoefficient);
+			// now normalized has value from -1 to 1, which also sets the direction of bend
+
+			const half minStrength = 0.1;
+			const half maxStrength = 0.9;
+			return lerp(minStrength, maxStrength,normalized  );
 		}
 
 		float bendingAngle(float bendStrengthValue ){
 			return radians(90 - lerp(-90,90,bendStrengthValue));
 		}
 
-		void vert(inout appdata_full v){
-			_WindDirection = half4(1,4,0,0);
-			_PlantDirection = half4(1,2,0,0);
+		half4 assertNotZero(half4 inVal){
+			if( inVal.x == 0 && inVal.y == 0 && inVal.z == 0 && inVal.w == 0 ){
+				return half4(0.01,0,0,0);
+			} else {
+				return inVal;
+			}
+		}
 
-			//v.vertex.x += abs(sin(_Time[0]*v.vertex.x));
+		// returns values from -1 to 1
+		half generateRandomWindMoveMultiplier( half bendingStrength ){
+			half currentNoiseValue = noise1D(_Time[3]);
+			half randomSinusDegreeOffsetAccordingToPosition =  rand(UNITY_MATRIX_MVP[0]);
+			half randomNoiseMultiplier = lerp(0.8, 1.2, currentNoiseValue);  
+			return sqrt(bendingStrength) * sin(_Time[3] * bendingStrength * 2 + randomSinusDegreeOffsetAccordingToPosition) * randomNoiseMultiplier ;
+		}
+
+		void vert(inout appdata_full v){
+			_WindDirection = assertNotZero(_WindDirection);
+			_PlantDirection = assertNotZero(_PlantDirection);
+
 			float l = v.texcoord[1];
 
-			const float PI = 3.14159;
-			float angle = bendingAngle(bendStrength(_BendingStrength, _WindDirection, _PlantDirection));
-			//v.vertex.x += l*cos(angle);
-			v.vertex.z = l*cos(angle);
-			v.vertex.y = abs(l*sin(angle));
+			half randomWindMultiplier =  generateRandomWindMoveMultiplier(_BendingStrength);
+			half xBendStrength = remapNeg(calculateXBendStrength(_BendingStrength, _WindDirection, _PlantDirection));
+			xBendStrength *= ( 1 + 0.2* randomWindMultiplier ); 
 
-			//v.vertex.z = ( generateDirectionCoef( _WindDirection, _PlantDirection))/7;
+			half yBendStrength = remapNeg(calculateYBendStrength(_BendingStrength, _WindDirection, _PlantDirection));
+			yBendStrength *= ( 1 + 0.2* randomWindMultiplier ); 
+
+			v.vertex.z = sign(xBendStrength)*((sin(l*fPI()/2-0.5*fPI())+1)/2) * abs(xBendStrength) * (1 + (sin(fPI()/2 * abs(xBendStrength))))*0.9;
+			v.vertex.y *= sin(lerp( 0,fPI()/2, 1- abs(xBendStrength)));
+
+			//half remapedXPos = remapNeg(v.vertex.x);
+			// has now value between -1 and 1
+
+			// v.vertex.x has from 0 to 1
+			half remapedXVertex = remapNeg(v.vertex.x);
+			// now xVertex has values from -1 + 1
+			v.vertex.x =   remap( remapedXVertex  + v.vertex.y*(1+(pow(v.vertex.y ,2))) * (yBendStrength*2));
+			//v.normal = normalize( half3(0.5, 0.5, 0.5));
 		}
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
 			// Albedo comes from a texture tinted by color
 			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
-			o.Albedo = c.bbb;
+			o.Albedo = half3(0.5, 0.5, 0.5);
 			// BendingStrength and smoothness come from slider variables
 			//o.BendingStrength = _BendingStrength;
-			//o.Smoothness = _Glossiness;
+			o.Smoothness = 0.0;
 
-			//o.Alpha = c.a*2;
+			o.Alpha = 0.0;
 		}
 		ENDCG
 	}
