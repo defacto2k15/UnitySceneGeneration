@@ -54,7 +54,7 @@ namespace Assets.Grass
         {
             var mesh = _generator.GetGrassBladeMesh(3); // todo do sth
             var outList = new List<GrassEntity>();
-            var singleCount = 50;
+            var singleCount = 50000;
             for (var i = 0; i < singleCount; i++)
             {
                 var entitiesSet = _singleGenerator.CreateSingleGrass();
@@ -62,6 +62,22 @@ namespace Assets.Grass
                 var randomScaledPos = new Vector3(randomNormalizedPos.x*rectangeSize.x, 0,
                     randomNormalizedPos.z*rectangeSize.y);
                 entitiesSet.TranslateBy(randomScaledPos);
+                outList.AddRange(entitiesSet.Entities);
+            }
+            return new GrassEntitiesWithMaterials(outList, material, mesh);
+        }
+
+        public GrassEntitiesWithMaterials GenerateLineGrass(Material material)
+        {
+            var mesh = _generator.GetGrassBladeMesh(3); // todo do sth
+            var outList = new List<GrassEntity>();
+            var singleCount = 20;
+            var fullLength = 2f;
+            for (var i = 0; i < singleCount; i++)
+            {
+                var entitiesSet = _singleGenerator.CreateSingleGrass();
+                Vector3 randomNormalizedPos = RandomGrassDistributionGenerator.GenerateRandomPosition();
+                entitiesSet.TranslateBy(new Vector3(i*fullLength/singleCount, 0, 0));
                 outList.AddRange(entitiesSet.Entities);
             }
             return new GrassEntitiesWithMaterials(outList, material, mesh);

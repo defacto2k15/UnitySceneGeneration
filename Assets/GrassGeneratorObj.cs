@@ -24,7 +24,7 @@ namespace Assets.Grass
             if (shouldUseInstancing)
             {
                 _grassInstanceContainer = new GpuInstancingGrassInstanceContainer();
-                shaderName = "Custom/testSurfaceShaderInstanced";
+                shaderName = "Custom/testSurfaceShader23.Instanced";
             }
             else
             {
@@ -35,7 +35,7 @@ namespace Assets.Grass
             var material = new Material(Shader.Find(shaderName));
             var entitiesGenerator = new GrassEntityGenerator();
 
-            var grassSplat = _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeSingleGrass(material, new Vector2(10, 20)));
+            var grassSplat = _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeSingleGrass(material, new Vector2(100, 200)));
 
             //_grassInstanceContainer.SetGlobalColor("_Color", new Color(0.4f, 0.4f, 0.4f));
         }
