@@ -1,32 +1,48 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Assets.Grass.Container;
 using Assets.Utils;
 using UnityEngine;
 
 namespace Assets.Grass.Instancing
 {
-    class GpuInstancingGrassInstanceGenerator : IGrassInstanceGenerator
+    class GpuInstancingGrassInstanceGenerator 
     {
-        GrassMeshGenerator generator = new GrassMeshGenerator();
-
-        public IGrassInstanceContainer Generate(Material material)
+        public GpuGrassInstancesTemplate Generate(GrassEntitiesWithMaterials grassEntitiesWithMaterials)
         {
-            List<Matrix4x4> maticesList = new List<Matrix4x4>();
-            List<UniformArray> uniformArrays = new List<UniformArray>();
-            List<Vector4> colorUniformList = new List<Vector4>();
-
-            var mesh = generator.GetGrassBladeMesh(2);
-            for (int i = 0; i < 999; i++)
+            var ab = grassEntitiesWithMaterials.Entities.Select(c => c.InitialBendingValue).ToArray();
+            return new GpuGrassInstancesTemplate(
+                grassEntitiesWithMaterials.Entities.Select(c => c.LocalToWorldMatrix).ToArray(), 
+                new List<IUniformArray>()
             {
-                for (int j = 0; j < 10; j++)
-                {
-                    maticesList.Add(TransformUtils.GetLocalToWorldMatrix(new Vector3(i / 4.0f, 0, j / 4.0f)));
-                    colorUniformList.Add( new Vector4((1.0f + i*0.15f)%1.0f, 0.5f, 0.5f, 0.5f));
-                }
-            }
+                UniformArray<Vector4>.Of("_Color", grassEntitiesWithMaterials.Entities.Select( c => (Vector4)c.Color ).ToArray()),
+                UniformArray<Vector4>.Of("_PlantDirection", grassEntitiesWithMaterials.Entities.Select( c => c.PlantDirection ).ToArray()),
+                UniformArray<float>.Of("_InitialBendingValue", grassEntitiesWithMaterials.Entities.Select( c => c.InitialBendingValue ).ToArray()),
+                UniformArray<float>.Of("_PlantBendingStiffness", grassEntitiesWithMaterials.Entities.Select( c => c.PlantBendingStiffness ).ToArray()),
+            });
+        }
+    }
 
-            UniformArray colorUniformArray = new UniformArray("_Color", colorUniformList.ToArray());
-            return new GpuInstancingGrassInstanceContainer(mesh, material, maticesList.ToArray(), new List<UniformArray>(){ colorUniformArray});
+
+    class GpuGrassInstancesTemplate
+    {
+        private readonly Matrix4x4[] _transformMatices;
+        private readonly List<IUniformArray> _uniformArrays;
+
+        public GpuGrassInstancesTemplate(Matrix4x4[] transformMatices, List<IUniformArray> uniformArrays)
+        {
+            _transformMatices = transformMatices;
+            _uniformArrays = uniformArrays;
+        }
+
+        public Matrix4x4[] TransformMatices
+        {
+            get { return _transformMatices; }
+        }
+
+        public List<IUniformArray> UniformArrays
+        {
+            get { return _uniformArrays; }
         }
     }
 }

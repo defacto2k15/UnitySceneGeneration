@@ -1,25 +1,34 @@
 ﻿using System.Collections.Generic;
 using Assets.Grass.Container;
+using Assets.Utils;
+using UnityEditor;
 using UnityEngine;
 
 namespace Assets.Grass.Instancing
 {
-    class GameObjectGrassInstanceGenerator : IGrassInstanceGenerator
+    class GameObjectGrassInstanceGenerator
     {
-        GrassMeshGenerator generator = new GrassMeshGenerator();
-
-        public IGrassInstanceContainer Generate(Material material)
+        public List<GameObject> Generate(GrassEntitiesWithMaterials grassEntitiesWithMaterials)
         {
-            var mesh = generator.GetGrassBladeMesh(2);
-            List<GameObject> gameObjects = new List<GameObject>();
+            var gameObjects = new List<GameObject>();
 
-            var grassInstance = new GameObject("grassInstance");
-            grassInstance.AddComponent<MeshFilter>().mesh =  generator.GetGrassBladeMesh(2);;
-            var rend = grassInstance.AddComponent<MeshRenderer>();
-            rend.material = material;
-            gameObjects.Add(grassInstance);
+            foreach (var aGrass in grassEntitiesWithMaterials.Entities)
+            {
+                var grassInstance = new GameObject("grassInstance");
+                grassInstance.AddComponent<MeshFilter>().mesh = grassEntitiesWithMaterials.Mesh;
+                grassInstance.transform.localPosition = aGrass.Position;
+                grassInstance.transform.localEulerAngles = MyMathUtils.RadToDeg(aGrass.Rotation);
+                grassInstance.transform.localScale = aGrass.Scale;
+                var rend = grassInstance.AddComponent<MeshRenderer>();
+                rend.material = grassEntitiesWithMaterials.Material;
+                rend.material.SetColor("_Color", aGrass.Color);
+                rend.material.SetFloat("_InitialBendingValue", aGrass.InitialBendingValue);
+                rend.material.SetFloat("_PlantBendingStiffness", aGrass.PlantBendingStiffness);
+                rend.material.SetVector("_PlantDirection", aGrass.PlantDirection);
+                gameObjects.Add(grassInstance);               
+            }
 
-            return new GameObjectGrassInstanceContainer(gameObjects);
+            return gameObjects;
         }
     }
 }

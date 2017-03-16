@@ -1,10 +1,8 @@
 ﻿Shader "Custom/testSurfaceShader23" {
 	Properties {
 		_Color ("Color", Color) = (1,1,1,1)
-		_MainTex ("Albedo (RGB)", 2D) = "white" {}
-		_Glossiness ("Smoothness", Range(0,1)) = 0.5
 		_BendingStrength ("BendingStrength", Range(0,1)) = 0.0
-		_InitialBendingVal ("InitialBendingValue", Range(-1, 1)) = 0.0
+		_InitialBendingValue ("InitialBendingValue", Range(-1, 1)) = 0.0
 		_PlantBendingStiffness("PlantBendingStiffness", Range(0,1)) = 0.5
 		_WindDirection("WindDirection", Vector) = (0.0,0.0, 0.0, 0.0)
 		_PlantDirection("PlantDirection", Vector) = (0.0,0.0, 0.0, 0.0)
@@ -12,6 +10,7 @@
 	SubShader {
 		Tags { "RenderType"="Opaque" }
 		LOD 200
+		//Cull Front
 		
 		CGPROGRAM
 		// Physically based Standard lighting model, and enable shadows on all light types
@@ -20,25 +19,21 @@
 		// Use shader model 3.0 target, to get nicer looking lighting
 		#pragma target 3.0
 
-
-		sampler2D _MainTex;
+		#include "common.inc"
 
 		struct Input {
-			float2 uv_MainTex;
+			float2 objectSpacePos;
+			float3 normal;
+			float3 viewDir;
 		};
 
-		half _Glossiness;
 		half _BendingStrength;
-		half _InitialBendingVal;
+		half _InitialBendingValue;
 		half _PlantBendingStiffness;
 		half4 _WindDirection;
 		half4 _PlantDirection;
 		fixed4 _Color;
 		
-		half fPI(){
-			return 3.14;
-		}
-
 		half rand(half seed)
 		{
 			return frac(sin( seed ) * 43758.5453);
@@ -54,14 +49,6 @@
 			return (pow(sin(x*fPI()*0.5),a*2))+1;
 		}
 
-		half remapNeg(half x){ // from (0,1) to (-1,1)
-			return (x-0.5)*2;
-		}
-
-		half remap(half x){ // from (-1,1) to (0,1)
-			return (x+1)/2;
-		}
-
 		half stiffnessFactor(half x){ // dostaje liczbe od 0 do 1. Zwraca od 0 do 1
 			half rx = remapNeg(x);
 			return (stiffnesInternalFunc(pow(rx,2)) * step(0,rx) +  (2-stiffnesInternalFunc(pow(rx,2)))*(1-step(0,rx)))/2;
@@ -75,7 +62,7 @@
 		// inWindValue - value from 0 to 1
 		// returns value from 0 to 1
 		float calculateXBendStrength( half inWindValue, half4 windDirection, half4 plantDirection ){
-			half normalizedInitialBendingVal =  remap(_InitialBendingVal);
+			half normalizedInitialBendingVal =  remap(_InitialBendingValue);
 
 			half initialBendingPowCoefficient = 0.5 - 1.6*normalizedInitialBendingVal + 9*normalizedInitialBendingVal*normalizedInitialBendingVal;
 
@@ -118,16 +105,28 @@
 		// returns values from -1 to 1
 		half generateRandomWindMoveMultiplier( half bendingStrength ){
 			half currentNoiseValue = noise1D(_Time[3]);
-			half randomSinusDegreeOffsetAccordingToPosition =  rand(UNITY_MATRIX_MVP[0]);
-			half randomNoiseMultiplier = lerp(0.8, 1.2, currentNoiseValue);  
-			return sqrt(bendingStrength) * sin(_Time[3] * bendingStrength * 2 + randomSinusDegreeOffsetAccordingToPosition) * randomNoiseMultiplier ;
+			half randomSinusDegreeOffsetAccordingToPosition 
+				= rand((UNITY_MATRIX_T_MV[0]+UNITY_MATRIX_T_MV[1]+UNITY_MATRIX_T_MV[2]+UNITY_MATRIX_T_MV[3]));
+			half randomNoiseMultiplier = lerp(0.8, 1.2, currentNoiseValue);
+			half bendStrengthMultiplier = lerp(0.4, 0.6, sin(pow(bendingStrength,2) * fPI()));  
+			half frequencyMultiplier = lerp(0.5, 1.5, pow(bendingStrength,2));
+
+			return  sin(_Time[3] * frequencyMultiplier * 2 + randomSinusDegreeOffsetAccordingToPosition*3) * randomNoiseMultiplier*bendStrengthMultiplier ;
 		}
 
-		void vert(inout appdata_full v){
+		half calculateNormal(half yPos, half zPos ){
+			zPos = max(zPos, 0.001); // not to divide by 0
+			half angle = atan( yPos / zPos );
+			return normalize( half3(1.0, cos(angle), -sin(angle)));
+		}
+
+		void vert(inout appdata_full v, out Input o){
+			UNITY_INITIALIZE_OUTPUT(Input, o);
 			_WindDirection = assertNotZero(_WindDirection);
 			_PlantDirection = assertNotZero(_PlantDirection);
+			o.objectSpacePos = v.vertex.xy;
 
-			float l = v.texcoord[1];
+			float l = v.texcoord[1]; // height of vertex from 0 to 1
 
 			half randomWindMultiplier =  generateRandomWindMoveMultiplier(_BendingStrength);
 			half xBendStrength = remapNeg(calculateXBendStrength(_BendingStrength, _WindDirection, _PlantDirection));
@@ -136,28 +135,32 @@
 			half yBendStrength = remapNeg(calculateYBendStrength(_BendingStrength, _WindDirection, _PlantDirection));
 			yBendStrength *= ( 1 + 0.2* randomWindMultiplier ); 
 
-			v.vertex.z = sign(xBendStrength)*((sin(l*fPI()/2-0.5*fPI())+1)/2) * abs(xBendStrength) * (1 + (sin(fPI()/2 * abs(xBendStrength))))*0.9;
-			v.vertex.y *= sin(lerp( 0,fPI()/2, 1- abs(xBendStrength)));
-
-			//half remapedXPos = remapNeg(v.vertex.x);
-			// has now value between -1 and 1
+			v.vertex.z = xBendStrength*(  (sin(l*fPI()/2-0.5*fPI())+1)/2)  * (1 + (sin(fPI()/2 * abs(xBendStrength))))*0.9;
+			v.vertex.y = l *  sin(lerp( 0,fPI()/2, 1- abs(xBendStrength)));
 
 			// v.vertex.x has from 0 to 1
 			half remapedXVertex = remapNeg(v.vertex.x);
 			// now xVertex has values from -1 + 1
 			v.vertex.x =   remap( remapedXVertex  + v.vertex.y*(1+(pow(v.vertex.y ,2))) * (yBendStrength*2));
-			//v.normal = normalize( half3(0.5, 0.5, 0.5));
+
+			// calculating normals
+			o.normal = v.normal = calculateNormal(v.vertex.y, v.vertex.z);
+
 		}
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
-			// Albedo comes from a texture tinted by color
-			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
-			o.Albedo = half3(0.5, 0.5, 0.5);
-			// BendingStrength and smoothness come from slider variables
-			//o.BendingStrength = _BendingStrength;
-			o.Smoothness = 0.0;
+			// IN.objectSpacePos.x  is from -0.5 to 0.5. We change it to from 0 to 1, and then multiply
+			half fixedXPos = (IN.objectSpacePos.x + 0.5) ;
+			// now it has values from 0 to 1
+			fixed4 c = _Color * 0.9 + 0.2* (1-pow(abs((fixedXPos*2-1)),0.3));
+			//c.x = dot(IN.viewDir, float3(0, 0, 1));
 
-			o.Alpha = 0.0;
+			o.Albedo = c;
+			o.Emission = half3(0,0,0);
+			o.Metallic = 0.8;
+			o.Smoothness = 0.8;
+
+			o.Normal = IN.normal;
 		}
 		ENDCG
 	}

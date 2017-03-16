@@ -21,7 +21,7 @@ namespace Assets.Grass
             Mesh mesh = new Mesh();
             mesh.Clear();
 
-            var sw= 0.3f; //standard width
+            var sw= 1.0f; //standard width
             var sh= 1.0f; //standard height
             var df= 0.5f; //decrease factor
 
@@ -44,8 +44,18 @@ namespace Assets.Grass
             vertices[vertexCount-1] = new Vector3(sw/2, sh);
             uvs[vertexCount-1] = new Vector2(sw/2, sh);
 
+            // vertex offset unmaking making
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i] -= new Vector3(sw/2,0,0 );
+            }
+
 
             Vector3[] normales = new Vector3[vertices.Length];
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                normales[i] = new Vector3(0.4f,0.4f,0.4f);
+            }
 
 
             var trianglesCount = 2*levelsCount + 1;

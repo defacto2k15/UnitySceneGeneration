@@ -81,13 +81,19 @@
     <Compile Include="Assets\Grass\Container\GameObjectGrassInstanceContainer.cs" />
     <Compile Include="Assets\Grass\Container\GpuInstancingGrassInstanceContainer.cs" />
     <Compile Include="Assets\Grass\Container\IGrassInstanceContainer.cs" />
-    <Compile Include="Assets\Grass\GrassGeneratorObj.cs" />
-    <Compile Include="Assets\Grass\GrassMeshGenerator.cs" />
-    <Compile Include="Assets\Grass\GrassInstance.cs" />
-    <Compile Include="Assets\Grass\GrassTuftGenerator.cs" />
+    <Compile Include="Assets\Grass\Generating\GrassEntitiesSet.cs" />
+    <Compile Include="Assets\Grass\Generating\GrassSingleGenerator.cs" />
+    <Compile Include="Assets\Grass\GrassEntitiesWithMaterials.cs" />
+    <Compile Include="Assets\Grass\Generating\GrassEntityGenerator.cs" />
+    <Compile Include="Assets\GrassGeneratorObj.cs" />
+    <Compile Include="Assets\Grass\Generating\GrassMeshGenerator.cs" />
+    <Compile Include="Assets\Grass\GrassEntity.cs" />
+    <Compile Include="Assets\Grass\GrassSplat.cs" />
+    <Compile Include="Assets\Grass\Generating\GrassTuftGenerator.cs" />
     <Compile Include="Assets\Grass\Instancing\GameObjectGrassInstanceGenerator.cs" />
     <Compile Include="Assets\Grass\Instancing\GpuInstancingGrassInstanceGenerator.cs" />
-    <Compile Include="Assets\Grass\Instancing\IGrassInstanceGenerator.cs" />
+    <Compile Include="Assets\Grass\Generating\RandomGrassGenerator.cs" />
+    <Compile Include="Assets\Grass\Generating\RandomTuftGenerator.cs" />
     <Compile Include="Assets\HeightmapArray.cs" />
     <Compile Include="Assets\HeightmapFile.cs" />
     <Compile Include="Assets\HeightmapMargin.cs" />
@@ -104,6 +110,8 @@
     <Compile Include="Assets\SubmapInfo.cs" />
     <Compile Include="Assets\SubmapPlane.cs" />
     <Compile Include="Assets\TerrainLoader.cs" />
+    <Compile Include="Assets\Utils\MyMathUtils.cs" />
+    <Compile Include="Assets\Utils\MyRange.cs" />
     <Compile Include="Assets\Utils\TransformUtils.cs" />
     <Compile Include="Assets\Utils\UtilsGameObject.cs" />
   </ItemGroup>
@@ -113,6 +121,9 @@
     <None Include="Assets\shaders\myShader2.shader" />
     <None Include="Assets\shaders\myShader3GlobalStates.shader" />
     <None Include="Assets\shaders\testSurfaceShader.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\shaders\common.inc" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2012\UnityVS.CSharp.targets" />
 </Project>
