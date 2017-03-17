@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Assets.Grass.Billboard;
 using Assets.Grass.Container;
 using Assets.Grass.Instancing;
+using Assets.Grass.Placing;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
@@ -15,6 +17,7 @@ namespace Assets.Grass
     {
         public bool shouldUseInstancing = true;
         private IGrassInstanceContainer _grassInstanceContainer;
+        public Material BillboardMaterial;
 
         private void Start()
         {
@@ -29,15 +32,18 @@ namespace Assets.Grass
             else
             {
                 _grassInstanceContainer = new GameObjectGrassInstanceContainer();
-                shaderName = "Custom/testSurfaceShader23" ;
+                shaderName = "Custom/testSurfaceShader23";
             }
 
             var material = new Material(Shader.Find(shaderName));
             var entitiesGenerator = new GrassEntityGenerator();
 
-            var grassSplat = _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeSingleGrass(material, new Vector2(100, 200)));
+            var grassSplat = _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangleTufts(material,
+                new UniformRectangleGrassPlacer( Vector2.zero, new Vector2(10, 20))));
 
-            //_grassInstanceContainer.SetGlobalColor("_Color", new Color(0.4f, 0.4f, 0.4f));
+
+            //GrassBillboardGenerator billboardGenerator = new GrassBillboardGenerator();
+            //billboardGenerator.GenerateTriangleTurf(BillboardMaterial);
         }
 
         static float a = 0;

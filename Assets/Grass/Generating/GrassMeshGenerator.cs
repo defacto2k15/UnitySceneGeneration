@@ -95,5 +95,91 @@ namespace Assets.Grass
             }
             return meshCache[turfCount];
         }
+
+        private readonly Dictionary<Vector2, Mesh> _billboardMeshCache = new Dictionary<Vector2, Mesh>(); 
+
+        public Mesh GetGrassBillboardMesh(float minUv, float maxUv)
+        {
+            var vec = new Vector2(minUv, maxUv);
+            if (!_billboardMeshCache.ContainsKey(vec))
+            {
+                _billboardMeshCache[vec] = GenerateGrassBillboardMesh(minUv, maxUv);
+            }
+            return _billboardMeshCache[vec];
+        }
+
+        private Mesh GenerateGrassBillboardMesh(float minUv, float maxUv)
+        {
+            Mesh mesh = new Mesh();
+            mesh.Clear();
+
+            int resX = 2;
+            int resZ = 2;
+
+            float width = 1;
+            float height = 1;
+
+            #region Vertices
+            //todo remove regions to refactor to methods when resharper is present!
+            Vector3[] vertices = new Vector3[resX * resZ];
+            for (int z = 0; z < resZ; z++)
+            {
+                float zPos = ((float)z / (resZ - 1));
+                for (int x = 0; x < resX; x++)
+                {
+                    float xPos = ((float)x / (resX - 1));
+                    vertices[x + z * resX] = new Vector3(xPos - (width / 2), 0, zPos);
+                }
+            }
+
+            Vector3[] normales = new Vector3[vertices.Length];
+            for (int n = 0; n < normales.Length; n++)
+                normales[n] = Vector3.up;
+            #endregion
+
+            #region UVs
+
+            float uvLength = maxUv - minUv;
+            Vector2[] uvs = new Vector2[vertices.Length];
+            for (int v = 0; v < resZ; v++)
+            {
+                for (int u = 0; u < resX; u++)
+                {
+                    uvs[u + v * resX] = new Vector2(minUv + ((float)u / (resX - 1)) * uvLength, (float)v / (resZ - 1));
+                }
+            }
+            #endregion
+
+            #region Triangles
+            int nbFaces = (resX - 1) * (resZ - 1);
+            int[] triangles = new int[nbFaces * 6];
+            int t = 0;
+            for (int face = 0; face < nbFaces; face++)
+            {
+                // Retrieve lower left corner from face ind
+                int i = face % (resX - 1) + (face / (resX - 1) * resX);
+
+                triangles[t++] = i + resX;
+                triangles[t++] = i + 1;
+                triangles[t++] = i;
+
+                triangles[t++] = i + resX;
+                triangles[t++] = i + resX + 1;
+                triangles[t++] = i + 1;
+            }
+            #endregion
+
+            mesh.vertices = vertices;
+            mesh.normals = normales;
+            mesh.uv = uvs;
+            mesh.triangles = triangles;
+
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+
+            return mesh;
+        }
     }
+
+     
 }

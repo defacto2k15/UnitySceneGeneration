@@ -77,6 +77,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Grass\Billboard\GrassBillboardGenerator.cs" />
     <Compile Include="Assets\Grass\Constants.cs" />
     <Compile Include="Assets\Grass\Container\GameObjectGrassInstanceContainer.cs" />
     <Compile Include="Assets\Grass\Container\GpuInstancingGrassInstanceContainer.cs" />
@@ -94,6 +95,8 @@
     <Compile Include="Assets\Grass\Instancing\GpuInstancingGrassInstanceGenerator.cs" />
     <Compile Include="Assets\Grass\Generating\RandomGrassGenerator.cs" />
     <Compile Include="Assets\Grass\Generating\RandomTuftGenerator.cs" />
+    <Compile Include="Assets\Grass\Placing\IGrassPlacer.cs" />
+    <Compile Include="Assets\Grass\Placing\UniformRectangleGrassPlacer.cs" />
     <Compile Include="Assets\HeightmapArray.cs" />
     <Compile Include="Assets\HeightmapFile.cs" />
     <Compile Include="Assets\HeightmapMargin.cs" />
@@ -116,6 +119,7 @@
     <Compile Include="Assets\Utils\UtilsGameObject.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\shaders\grassBillboard.shader" />
     <None Include="Assets\shaders\instanced.shader" />
     <None Include="Assets\shaders\myShader1.shader" />
     <None Include="Assets\shaders\myShader2.shader" />
