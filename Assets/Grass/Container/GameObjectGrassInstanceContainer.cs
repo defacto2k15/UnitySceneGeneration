@@ -34,6 +34,11 @@ namespace Assets.Grass.Container
             ForeachObject((aObject) => aObject.GetComponent<Renderer>().material.SetFloat(name, value));
         }
 
+        public void SetGlobalUniform(GrassShaderUniformName name, Vector4 value)
+        {
+            ForeachObject((aObject) => aObject.GetComponent<Renderer>().material.SetVector(name.ToString(), value));
+        }
+
         private void ForeachObject(Action<GameObject> action)
         {
             foreach (var pair in _gameObjectSplats)

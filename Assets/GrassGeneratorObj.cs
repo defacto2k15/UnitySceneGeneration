@@ -60,6 +60,8 @@ namespace Assets.Grass
             //GrassBillboardGenerator billboardGenerator = new GrassBillboardGenerator();
             //GrassEntitiesWithMaterials bilboardTurf = generateTurf(billboardGenerator);
             //var splat = _grassInstanceContainer.AddGrassEntities(bilboardTurf);
+
+            _grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._WindDirection, new Vector4(1,0,0,0).normalized);
         }
 
         private GrassEntitiesWithMaterials generateTurf(GrassBillboardGenerator billboardGenerator)

@@ -84,6 +84,7 @@
     <Compile Include="Assets\Grass\Container\GpuInstancingGrassInstanceContainer.cs" />
     <Compile Include="Assets\Grass\Container\GpuInstancingGrassSplat.cs" />
     <Compile Include="Assets\Grass\Container\IGrassInstanceContainer.cs" />
+    <Compile Include="Assets\Grass\GrassShaderUniform.cs" />
     <Compile Include="Assets\Grass\GrassShaderUniformName.cs" />
     <Compile Include="Assets\Grass\Lod\IGrassSplatsProvider.cs" />
     <Compile Include="Assets\Grass\Generating\GrassEntitiesSet.cs" />

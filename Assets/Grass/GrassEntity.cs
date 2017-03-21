@@ -9,11 +9,12 @@ namespace Assets.Grass
 {
     internal class GrassEntity
     {
-        private readonly List<IGrassShaderUniform> _uniforms = new List<IGrassShaderUniform>(); 
         private Matrix4x4 _localToWorldMatrix;
         private Vector3 _position;
         private Vector3 _rotation;
         private Vector3 _scale;
+        private readonly List<GrassShaderUniform<float>> _floatUniforms = new List<GrassShaderUniform<float>>();
+        private readonly List<GrassShaderUniform<Vector4>> _vector4Uniforms = new List<GrassShaderUniform<Vector4>>();
 
         public Vector3 Position
         {
@@ -62,48 +63,27 @@ namespace Assets.Grass
 
         public void AddUniform(GrassShaderUniformName name, float value)
         {
-            _uniforms.Add( new GrassShaderUniform<float>(name, value, (mat, aName, aValue) => mat.SetFloat(aName.ToString(),aValue)));
-        }
-
-        public void AddUniform(GrassShaderUniformName name, Color value)
-        {
-            _uniforms.Add( new GrassShaderUniform<Color>(name, value, (mat, aName, aValue) => mat.SetColor(aName.ToString(),aValue)));
+            _floatUniforms.Add(new GrassShaderUniform<float>(name, value));
         }
 
         public void AddUniform(GrassShaderUniformName name, Vector4 value)
         {
-            _uniforms.Add( new GrassShaderUniform<Color>(name, value, (mat, aName, aValue) => mat.SetVector(aName.ToString(),aValue)));
+            _vector4Uniforms.Add(new GrassShaderUniform<Vector4>(name, value));
         }
 
-        public List<IGrassShaderUniform> GetUniforms()
+        public void AddUniform(GrassShaderUniformName name, Color value)
         {
-            AddUniform(GrassShaderUniformName._PlantDirection, PlantDirection);
-            return _uniforms.ToList();
+            _vector4Uniforms.Add(new GrassShaderUniform<Vector4>(name, value));
+        }
+
+        public List<GrassShaderUniform<float>> GetFloatUniforms()
+        {
+            return _floatUniforms;
         } 
-    }
 
-    interface IGrassShaderUniform
-    {
-        void Set(Material material);
-    }
-
-    class GrassShaderUniform<T> : IGrassShaderUniform
-    {
-        private readonly GrassShaderUniformName _name;
-        private readonly T _value;
-
-        private readonly Action<Material, GrassShaderUniformName, T> _materialSetter;
-
-        public GrassShaderUniform(GrassShaderUniformName name, T value, Action<Material, GrassShaderUniformName, T> materialSetter)
+        public List<GrassShaderUniform<Vector4>> GetVector4Uniforms()
         {
-            _name = name;
-            _value = value;
-            _materialSetter = materialSetter;
-        }
-
-        public void Set(Material material)
-        {
-            _materialSetter(material, _name, _value);
-        }
+            return _vector4Uniforms;
+        }  
     }
 }

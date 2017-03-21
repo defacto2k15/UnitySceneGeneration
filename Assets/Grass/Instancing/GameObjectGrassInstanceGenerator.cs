@@ -22,10 +22,15 @@ namespace Assets.Grass.Instancing
                 var rend = grassInstance.AddComponent<MeshRenderer>();
                 rend.material = grassEntitiesWithMaterials.Material;
 
-                foreach (var uniform in aGrass.GetUniforms())
+                foreach (var uniform in aGrass.GetFloatUniforms())
                 {
-                    uniform.Set(rend.material);
+                    rend.material.SetFloat(uniform.Name, uniform.Get());
                 }
+                foreach (var uniform in aGrass.GetVector4Uniforms())
+                {
+                    rend.material.SetVector(uniform.Name, uniform.Get());
+                }
+
                 gameObjects.Add(grassInstance);               
             }
 

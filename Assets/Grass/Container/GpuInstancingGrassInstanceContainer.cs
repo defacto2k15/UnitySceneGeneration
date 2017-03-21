@@ -80,6 +80,11 @@ namespace Assets.Grass.Container
             ForeachObject(aGrassPack => aGrassPack.MyBlock.AddGlobalUniform(name, value));
         }
 
+        public void SetGlobalUniform(GrassShaderUniformName name, Vector4 value)
+        {
+            ForeachObject(aGrassPack => aGrassPack.MyBlock.AddGlobalUniform(name.ToString(), value));
+        }
+
         private void ForeachObject(Action<GrassPack> action)
         {
             foreach (var materialMeshPair in _grassPacks)
@@ -133,56 +138,40 @@ namespace Assets.Grass.Container
             var newValueArray = Enumerable.Repeat(value, _arraySize).ToArray();
             _block.SetFloatArray(name, newValueArray);    
         }
+
+        public void AddGlobalUniform(string name, Vector4 value)
+        {
+            var newValueArray = Enumerable.Repeat(value, _arraySize).ToArray();
+            _block.SetVectorArray(name, newValueArray);
+        }
     }
 
     class UniformArray<T> : IUniformArray
     {
-        private string _name;
-        private T[] _valuesArray;
-        private readonly Action<MaterialPropertyBlock, string, T[]> _settingFunc;
+        private GrassShaderUniform<T>[] _uniformsArray;
 
-        private UniformArray(string name, T[] valuesArray, Action< MaterialPropertyBlock, string, T[] > settingFunc  )
+        public UniformArray(GrassShaderUniform<T>[] uniformsArray)
         {
-            this._name = name;
-            _valuesArray = valuesArray;
-            _settingFunc = settingFunc;
+            _uniformsArray = uniformsArray;
         }
 
         public void AddToBlock(MaterialPropertyBlock block, int elementsToSkipCount, int elementsToTakeCount)
         {
-            _settingFunc(block, _name, _valuesArray.Skip(elementsToSkipCount).Take(elementsToTakeCount).ToArray());
+            var values = _uniformsArray.Skip(elementsToSkipCount).Take(elementsToTakeCount).Select(c => c.Get()).ToArray();
+            var name = _uniformsArray[0].Name;
+            if (typeof (T) == typeof (float))
+            {
+                block.SetFloatArray(name, values.Cast<float>().ToArray());
+            } else if (typeof (T) == typeof (Vector4) || typeof (T) == typeof (Color))
+            {
+                block.SetVectorArray(name, values.Cast<Vector4>().ToArray());
+            }
         }
 
         public int Count
         {
-            get { return _valuesArray.Length; }
+            get { return _uniformsArray.Length;  }
         }
-
-        public string Name
-        {
-            get { return _name; }
-        }
-
-        public T[] ValuesArray
-        {
-            get { return _valuesArray; }
-        }
-
-        public static UniformArray<float> Of(string name, float[] values)
-        {
-            return new UniformArray<float>(name, values, (block, aName, aValues) =>
-            {
-                block.SetFloatArray(aName, aValues);
-            });
-        }
-
-        public static UniformArray<Vector4> Of(string name, Vector4[] values)
-        {
-            return new UniformArray<Vector4>(name, values, (block, aName, aValues) =>
-            {
-                block.SetVectorArray(aName, aValues);
-            });
-        } 
     }
 
     interface IUniformArray
