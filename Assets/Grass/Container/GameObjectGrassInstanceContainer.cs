@@ -10,32 +10,44 @@ namespace Assets.Grass.Container
     class GameObjectGrassInstanceContainer : IGrassInstanceContainer
     {
         private readonly GameObjectGrassInstanceGenerator _generator = new GameObjectGrassInstanceGenerator();
-        private readonly List<GameObject> _gameObjects = new List<GameObject>();
+        private readonly Dictionary<int, List<GameObject>> _gameObjectSplats = new Dictionary<int, List<GameObject>>();
+        private int _lastSplatId = 0;
 
         public void Draw()
         {
         }
 
-        public GrassSplat AddGrassEntities(GrassEntitiesWithMaterials grassEntitiesWithMaterials)
+        public IGrassSplat AddGrassEntities(GrassEntitiesWithMaterials grassEntitiesWithMaterials)
         {
-            _gameObjects.AddRange(_generator.Generate(grassEntitiesWithMaterials));
-            return new GrassSplat();
+            _lastSplatId++;
+            _gameObjectSplats[_lastSplatId] = _generator.Generate(grassEntitiesWithMaterials);
+            return new GameObjectGrassSplat(_lastSplatId, this);
         }
 
         public void SetGlobalColor(string name, Color value)
         {
-            foreach( var aObject in _gameObjects)
-            {
-                aObject.GetComponent<Renderer>().material.SetColor(name, value);
-            }
+            ForeachObject((aObject) => aObject.GetComponent<Renderer>().material.SetColor(name, value));
         }
 
         public void SetGlobalUniform(string name, float value)
         {
-            foreach (var aObject in _gameObjects)
+            ForeachObject((aObject) => aObject.GetComponent<Renderer>().material.SetFloat(name, value));
+        }
+
+        private void ForeachObject(Action<GameObject> action)
+        {
+            foreach (var pair in _gameObjectSplats)
             {
-                aObject.GetComponent<Renderer>().material.SetFloat(name, value);
+                foreach (var obj in pair.Value)
+                {
+                    action(obj);
+                }
             }
+        }
+
+        public void RemoveSplat(int splatId)
+        {
+            _gameObjectSplats.Remove(splatId);
         }
     }
 }

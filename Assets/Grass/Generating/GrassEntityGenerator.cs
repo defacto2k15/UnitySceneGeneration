@@ -17,7 +17,7 @@ namespace Assets.Grass
 
         public GrassEntitiesWithMaterials GenerateUniformRectangleTufts(Material material, IGrassPlacer placer)
         {
-            var mesh = _generator.GetGrassBladeMesh(3);
+            var mesh = _generator.GetGrassBladeMesh(1);
             var outList = new List<GrassEntity>();
             var tuftCount = 50; //todo do sth with it
             for (var i = 0; i < tuftCount; i++)
@@ -30,11 +30,11 @@ namespace Assets.Grass
             return new GrassEntitiesWithMaterials(outList, material, mesh);
         }
 
-        public GrassEntitiesWithMaterials GenerateUniformRectangeSingleGrass(Material material, IGrassPlacer placer)
+        public GrassEntitiesWithMaterials GenerateUniformRectangeSingleGrass(Material material, IGrassPlacer placer, int lodLevel)
         {
-            var mesh = _generator.GetGrassBladeMesh(3); // todo do sth
+            var mesh = _generator.GetGrassBladeMesh(Mathf.Max(1, 7 - lodLevel)); // todo do sth
             var outList = new List<GrassEntity>();
-            var singleCount = 50000;
+            var singleCount = 5;
             for (var i = 0; i < singleCount; i++)
             {
                 var entitiesSet = _singleGenerator.CreateSingleGrass();

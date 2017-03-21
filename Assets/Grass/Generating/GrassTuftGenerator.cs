@@ -36,10 +36,10 @@ namespace Assets.Grass
                                     (radiusFromCenter+radiousRandomOffset)*(float) Math.Cos(angle)+90),
                     Rotation = new Vector3(0,  angle, 0),
                     Scale = RandomGrassGenerator.GetScale(),
-                    Color = RandomGrassGenerator.GetGrassColor(tuftHue, tuftValue, randomSaturation),
-                    PlantBendingStiffness = RandomTuftGenerator.GetPlantBendingStiffness(basePlantBendingStiffness),
-                    InitialBendingValue = RandomTuftGenerator.GetPlantBendingValue(basePlantBendingValue),
-                };
+               };
+                grassEntity.AddUniform(GrassShaderUniformName._PlantBendingStiffness, RandomTuftGenerator.GetPlantBendingStiffness(basePlantBendingStiffness) );
+                grassEntity.AddUniform(GrassShaderUniformName._InitialBendingValue, RandomTuftGenerator.GetPlantBendingValue(basePlantBendingValue) );
+                grassEntity.AddUniform(GrassShaderUniformName._Color, RandomGrassGenerator.GetGrassColor(tuftHue));
                 entities.Add(grassEntity);
             }
 

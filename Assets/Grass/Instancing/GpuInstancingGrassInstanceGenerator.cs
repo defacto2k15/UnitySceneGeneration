@@ -10,16 +10,17 @@ namespace Assets.Grass.Instancing
     {
         public GpuGrassInstancesTemplate Generate(GrassEntitiesWithMaterials grassEntitiesWithMaterials)
         {
-            var ab = grassEntitiesWithMaterials.Entities.Select(c => c.InitialBendingValue).ToArray();
-            return new GpuGrassInstancesTemplate(
-                grassEntitiesWithMaterials.Entities.Select(c => c.LocalToWorldMatrix).ToArray(), 
-                new List<IUniformArray>()
-            {
-                UniformArray<Vector4>.Of("_Color", grassEntitiesWithMaterials.Entities.Select( c => (Vector4)c.Color ).ToArray()),
-                UniformArray<Vector4>.Of("_PlantDirection", grassEntitiesWithMaterials.Entities.Select( c => c.PlantDirection ).ToArray()),
-                UniformArray<float>.Of("_InitialBendingValue", grassEntitiesWithMaterials.Entities.Select( c => c.InitialBendingValue ).ToArray()),
-                UniformArray<float>.Of("_PlantBendingStiffness", grassEntitiesWithMaterials.Entities.Select( c => c.PlantBendingStiffness ).ToArray()),
-            });
+            //var ab = grassEntitiesWithMaterials.Entities.Select(c => c.InitialBendingValue).ToArray(); //todo
+            //return new GpuGrassInstancesTemplate(
+            //    grassEntitiesWithMaterials.Entities.Select(c => c.LocalToWorldMatrix).ToArray(), 
+            //    new List<IUniformArray>()
+            //{
+            //    UniformArray<Vector4>.Of("_Color", grassEntitiesWithMaterials.Entities.Select( c => (Vector4)c.Color ).ToArray()),
+            //    UniformArray<Vector4>.Of("_PlantDirection", grassEntitiesWithMaterials.Entities.Select( c => c.PlantDirection ).ToArray()),
+            //    UniformArray<float>.Of("_InitialBendingValue", grassEntitiesWithMaterials.Entities.Select( c => c.InitialBendingValue ).ToArray()),
+            //    UniformArray<float>.Of("_PlantBendingStiffness", grassEntitiesWithMaterials.Entities.Select( c => c.PlantBendingStiffness ).ToArray()),
+            //});
+            return null;
         }
     }
 

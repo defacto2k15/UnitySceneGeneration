@@ -6,21 +6,25 @@ using Assets.Grass.Instancing;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+using PackId = System.Int32;
+
 namespace Assets.Grass.Container
 {
     class GpuInstancingGrassInstanceContainer : IGrassInstanceContainer
     {
-        private Mesh _mesh; //todo what with multimesh and multimaterial??
-        private Material _material;
-        private readonly List<GrassPack> _grassPacks = new List<GrassPack>();
+        private readonly Dictionary<SplatInfo, Dictionary<PackId, List<GrassPack>>> _grassPacks = new Dictionary<SplatInfo, Dictionary<PackId, List<GrassPack>>>();
+        private PackId lastPackId = 0;
+
         private readonly GpuInstancingGrassInstanceGenerator _generator = new GpuInstancingGrassInstanceGenerator();
 
-        public GrassSplat AddGrassEntities(GrassEntitiesWithMaterials grassEntitiesWithMaterials)
+        public IGrassSplat AddGrassEntities(GrassEntitiesWithMaterials grassEntitiesWithMaterials)
         {
             var grassInstancesTemplate = _generator.Generate(grassEntitiesWithMaterials);
 
             var maticesArray = grassInstancesTemplate.TransformMatices;
             var uniformArrays = grassInstancesTemplate.UniformArrays;
+
+            var newGrassPacks = new List<GrassPack>();
 
             for (var i = 0; i < Math.Ceiling((float) maticesArray.Length/ Constants.MaxInstancesPerPack); i++)
             {
@@ -33,45 +37,73 @@ namespace Assets.Grass.Container
                 {
                     aUniformArray.AddToBlock(block.Block, elementsToSkipCount, elementsToTakeCount);
                 }
-                _grassPacks.Add(new GrassPack(packMaticesArray, block));
+                newGrassPacks.Add(new GrassPack(packMaticesArray, block));
             }
 
-            _mesh = grassEntitiesWithMaterials.Mesh;
-            _material = grassEntitiesWithMaterials.Material;
-            return new GrassSplat();
+            var splatInfo = new SplatInfo(grassEntitiesWithMaterials.Mesh, grassEntitiesWithMaterials.Material);
+            if (!_grassPacks.ContainsKey(splatInfo))
+            {
+                _grassPacks.Add(splatInfo, new Dictionary<PackId, List<GrassPack>>());
+            }
+            lastPackId++;
+            _grassPacks[splatInfo][lastPackId] = newGrassPacks;
+
+            return new GpuInstancingGrassSplat(splatInfo, lastPackId, this);
         }
 
         public void Draw()
         {
             foreach (var aGrassPack in _grassPacks)
             {
-                Graphics.DrawMeshInstanced(_mesh, 0, _material, aGrassPack.MaticesArray, aGrassPack.InstancesCount, aGrassPack.MyBlock.Block, 
-                    aGrassPack.CastShadows, false,0, null );
+                foreach (var materialMeshPair in _grassPacks)
+                {
+                    foreach (var packList in materialMeshPair.Value.Values)
+                    {
+                        foreach (var pack in packList)
+                        {
+                            Graphics.DrawMeshInstanced(aGrassPack.Key.Mesh, 0, aGrassPack.Key.Material, pack.MaticesArray, pack.InstancesCount, pack.MyBlock.Block,
+                                pack.CastShadows, false, 0, null);
+                        }
+                    }
+                }
             }
         }
 
 
         public void SetGlobalColor(string name, Color value)
         {
-            foreach (var aGrassPack in _grassPacks)
-            {
-                aGrassPack.MyBlock.AddSingleVectorArray(name, value);
-            }
+            ForeachObject(aGrassPack => aGrassPack.MyBlock.AddSingleVectorArray(name, value));
         }
 
         public void SetGlobalUniform(string name, float value)
         {
-            foreach (var aGrassPack in _grassPacks)
+            ForeachObject(aGrassPack => aGrassPack.MyBlock.AddGlobalUniform(name, value));
+        }
+
+        private void ForeachObject(Action<GrassPack> action)
+        {
+            foreach (var materialMeshPair in _grassPacks)
             {
-                aGrassPack.MyBlock.AddGlobalUniform(name, value);
+                foreach (var packList in materialMeshPair.Value.Values)
+                {
+                    foreach (var pack in packList)
+                    {
+                        action(pack);
+                    }
+                }
             }
+        }
+
+        public void RemoveSplat(SplatInfo splatInfo, int packId)
+        {
+            _grassPacks[splatInfo].Remove(packId);
         }
     }
 
     class MyMaterialPropertyBlock
     {
         private int _arraySize;
-        private readonly MaterialPropertyBlock block = new MaterialPropertyBlock();
+        private readonly MaterialPropertyBlock _block = new MaterialPropertyBlock();
 
         public MyMaterialPropertyBlock(int arraySize)
         {
@@ -82,24 +114,24 @@ namespace Assets.Grass.Container
         {
             Preconditions.Assert(uniformArray.Count == _arraySize,
                 string.Format("Cant add vector of length {0} to block, as block length is {1}", uniformArray.Count, _arraySize));
-            uniformArray.AddToBlock(block, elementsToSkipCount, elementsToTakeCount);
+            uniformArray.AddToBlock(_block, elementsToSkipCount, elementsToTakeCount);
         }
 
         public void AddSingleVectorArray(string name, Vector4 value)
         {
             var newValueArray = Enumerable.Repeat(value, _arraySize).ToArray();
-            block.SetVectorArray(name, newValueArray);
+            _block.SetVectorArray(name, newValueArray);
         }
 
         public MaterialPropertyBlock Block
         {
-            get { return block; }
+            get { return _block; }
         }
 
         public void AddGlobalUniform(string name, float value)
         {
             var newValueArray = Enumerable.Repeat(value, _arraySize).ToArray();
-            block.SetFloatArray(name, newValueArray);    
+            _block.SetFloatArray(name, newValueArray);    
         }
     }
 
@@ -177,5 +209,75 @@ namespace Assets.Grass.Container
         public int InstancesCount { get; private set; }
 
         public MyMaterialPropertyBlock MyBlock { get; private set; }
+    }
+
+    internal class SplatInfo
+    {
+        private Mesh _mesh;
+        private Material _material;
+
+        public SplatInfo(Mesh mesh, Material material)
+        {
+            this._mesh = mesh;
+            this._material = material;
+        }
+
+        public Mesh Mesh
+        {
+            get { return _mesh; }
+        }
+
+        public Material Material
+        {
+            get { return _material; }
+        }
+
+        protected bool Equals(SplatInfo other)
+        {
+            return Equals(_mesh, other._mesh) && Equals(_material, other._material);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((SplatInfo) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((_mesh != null ? _mesh.GetHashCode() : 0)*397) ^ (_material != null ? _material.GetHashCode() : 0);
+            }
+        }
+
+        private sealed class MeshMaterialEqualityComparer : IEqualityComparer<SplatInfo>
+        {
+            public bool Equals(SplatInfo x, SplatInfo y)
+            {
+                if (ReferenceEquals(x, y)) return true;
+                if (ReferenceEquals(x, null)) return false;
+                if (ReferenceEquals(y, null)) return false;
+                if (x.GetType() != y.GetType()) return false;
+                return Equals(x._mesh, y._mesh) && Equals(x._material, y._material);
+            }
+
+            public int GetHashCode(SplatInfo obj)
+            {
+                unchecked
+                {
+                    return ((obj._mesh != null ? obj._mesh.GetHashCode() : 0)*397) ^ (obj._material != null ? obj._material.GetHashCode() : 0);
+                }
+            }
+        }
+
+        private static readonly IEqualityComparer<SplatInfo> MeshMaterialComparerInstance = new MeshMaterialEqualityComparer();
+
+        public static IEqualityComparer<SplatInfo> MeshMaterialComparer
+        {
+            get { return MeshMaterialComparerInstance; }
+        }
     }
 }

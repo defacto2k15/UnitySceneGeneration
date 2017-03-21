@@ -21,14 +21,14 @@
 		
 		#include "common.inc"
 		#include "noise.inc"
-		#include "grassGeneration.inc"
+		#include "singleGrassGeneration.inc"
 
 
 		half _BendingStrength;
 		half _InitialBendingValue;
 		half _PlantBendingStiffness;
 		half4 _WindDirection;
-		half4 _PlantDirection;
+		half4 _PlantDirection; 
 		fixed4 _Color;
 		
 
@@ -37,7 +37,7 @@
 		}  
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
-			grass_surf(IN, o, _Color);
+			grass_surf(IN, o, _Color);  
 		}
 		ENDCG
 	}

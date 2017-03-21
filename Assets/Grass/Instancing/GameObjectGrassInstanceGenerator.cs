@@ -21,10 +21,11 @@ namespace Assets.Grass.Instancing
                 grassInstance.transform.localScale = aGrass.Scale;
                 var rend = grassInstance.AddComponent<MeshRenderer>();
                 rend.material = grassEntitiesWithMaterials.Material;
-                rend.material.SetColor("_Color", aGrass.Color);
-                rend.material.SetFloat("_InitialBendingValue", aGrass.InitialBendingValue);
-                rend.material.SetFloat("_PlantBendingStiffness", aGrass.PlantBendingStiffness);
-                rend.material.SetVector("_PlantDirection", aGrass.PlantDirection);
+
+                foreach (var uniform in aGrass.GetUniforms())
+                {
+                    uniform.Set(rend.material);
+                }
                 gameObjects.Add(grassInstance);               
             }
 

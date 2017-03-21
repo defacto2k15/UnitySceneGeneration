@@ -5,7 +5,8 @@ using System.Text;
 
 namespace Assets.Grass
 {
-    class GrassSplat
+    interface IGrassSplat
     {
+        void Remove();
     }
 }

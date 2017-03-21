@@ -11,9 +11,9 @@ namespace Assets.Grass
     {
         private readonly Dictionary<int, Mesh> meshCache = new Dictionary<int, Mesh>(); 
 
-        public static Mesh GenerateGrassBladeMesh( int turfCount)
+        public static Mesh GenerateGrassBladeMesh( int levelsCount)
         {
-            var levelsCount = 6;
+            Preconditions.Assert(levelsCount >= 1, "levelsCount must be >= 1");
             Func<float, float> leftOffsetGenerator = (percent) =>
             {
                 return 1.0f - (float)Math.Pow(-percent+1.0f, 0.5f);
@@ -128,7 +128,7 @@ namespace Assets.Grass
                 for (int x = 0; x < resX; x++)
                 {
                     float xPos = ((float)x / (resX - 1));
-                    vertices[x + z * resX] = new Vector3(xPos - (width / 2), 0, zPos);
+                    vertices[x + z * resX] = new Vector3(xPos - (width / 2), zPos, 0);
                 }
             }
 

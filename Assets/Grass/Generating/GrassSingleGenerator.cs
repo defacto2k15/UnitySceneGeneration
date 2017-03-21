@@ -19,10 +19,10 @@ namespace Assets.Grass.Generating
                 Position = new Vector3(0,0,0),
                 Rotation = new Vector3(0, angle, 0),
                 Scale = RandomGrassGenerator.GetScale(),
-                Color = RandomGrassGenerator.GetGrassColor(),
-                PlantBendingStiffness = plantBendingSiffness ,
-                InitialBendingValue = initialBendingValue ,
             };
+            grassEntity.AddUniform(GrassShaderUniformName._PlantBendingStiffness,  plantBendingSiffness);
+            grassEntity.AddUniform(GrassShaderUniformName._InitialBendingValue,  initialBendingValue);
+            grassEntity.AddUniform(GrassShaderUniformName._Color,  RandomGrassGenerator.GetGrassColor() );
             return new GrassEntitiesSet(new List<GrassEntity>{grassEntity});
         }
     }

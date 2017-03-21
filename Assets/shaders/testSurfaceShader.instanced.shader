@@ -27,12 +27,10 @@ Shader "Custom/testSurfaceShader23.Instanced" {
 		// #pragma instancing_options
 
 
-		#include "common.inc"
-		#include "noise.inc"
-		#include "grassGeneration.inc"
+		#include "singleGrassGeneration.inc"  
 
-		UNITY_INSTANCING_CBUFFER_START(Props)
-			UNITY_DEFINE_INSTANCED_PROP(fixed4,_Color)	
+		UNITY_INSTANCING_CBUFFER_START(Props)  
+			UNITY_DEFINE_INSTANCED_PROP(fixed4,_Color)	 
 			UNITY_DEFINE_INSTANCED_PROP(fixed, _BendingStrength )	
 			UNITY_DEFINE_INSTANCED_PROP(half,  _InitialBendingValue )	
 			UNITY_DEFINE_INSTANCED_PROP(fixed, _PlantBendingStiffness) 
@@ -51,7 +49,7 @@ Shader "Custom/testSurfaceShader23.Instanced" {
 		}
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
-			grass_surf(IN, o, UNITY_ACCESS_INSTANCED_PROP(_Color));
+			grass_surf(IN, o, UNITY_ACCESS_INSTANCED_PROP(_Color)); 
 		}
 		ENDCG
 	}
