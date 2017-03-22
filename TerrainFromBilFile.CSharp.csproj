@@ -123,6 +123,7 @@
     <Compile Include="Assets\TerrainLoader.cs" />
     <Compile Include="Assets\Utils\MyMathUtils.cs" />
     <Compile Include="Assets\Utils\MyRange.cs" />
+    <Compile Include="Assets\Utils\MyTransformTriplet.cs" />
     <Compile Include="Assets\Utils\TransformUtils.cs" />
     <Compile Include="Assets\Utils\UtilsGameObject.cs" />
   </ItemGroup>

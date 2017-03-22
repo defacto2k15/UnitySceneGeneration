@@ -23,6 +23,7 @@ namespace Assets.Grass.Generating
             grassEntity.AddUniform(GrassShaderUniformName._PlantBendingStiffness,  plantBendingSiffness);
             grassEntity.AddUniform(GrassShaderUniformName._InitialBendingValue,  initialBendingValue);
             grassEntity.AddUniform(GrassShaderUniformName._Color,  RandomGrassGenerator.GetGrassColor() );
+            grassEntity.AddUniform(GrassShaderUniformName._RandSeed, UnityEngine.Random.value );
             return new GrassEntitiesSet(new List<GrassEntity>{grassEntity});
         }
     }

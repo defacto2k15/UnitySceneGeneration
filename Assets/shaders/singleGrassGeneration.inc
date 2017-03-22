@@ -17,13 +17,13 @@ half3 calculateNormal(half yPos, half zPos ){
 		};
 
 		void grass_vert(inout appdata_full v, out Input o, 
-				half l_BendingStrength, half l_InitialBendingValue, half l_PlantBendingStiffness, half4 l_WindDirection, half4 l_PlantDirection, fixed4 l_Color  ){
+				half l_BendingStrength, half l_InitialBendingValue, half l_PlantBendingStiffness, half4 l_WindDirection, half4 l_PlantDirection, fixed4 l_Color, half l_RandSeed  ){
 			UNITY_INITIALIZE_OUTPUT(Input, o);
 			o.objectSpacePos = v.vertex.xy;
 
 			float l = v.texcoord[1]; // height of vertex from 0 to 1
 
-			half2 strengths = generateStrengths( l_BendingStrength, l_InitialBendingValue, l_PlantBendingStiffness, l_WindDirection, l_PlantDirection);
+			half2 strengths = generateStrengths( l_BendingStrength, l_InitialBendingValue, l_PlantBendingStiffness, l_WindDirection, l_PlantDirection, l_RandSeed);
 			half xBendStrength = strengths.x;
 			half yBendStrength = strengths.y;
 

@@ -17,5 +17,9 @@ namespace Assets.Utils
         {
             return new Vector3(Mathf.Deg2Rad * input.x, Mathf.Deg2Rad * input.y, Mathf.Deg2Rad * input.z);
         }
+
+        public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 eulerAngles) {
+            return Quaternion.Euler(eulerAngles) * (point - pivot) + pivot;
+        }
     }
 }

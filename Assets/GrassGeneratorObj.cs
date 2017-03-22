@@ -8,6 +8,7 @@ using Assets.Grass.Container;
 using Assets.Grass.Instancing;
 using Assets.Grass.Lod;
 using Assets.Grass.Placing;
+using Assets.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
@@ -61,14 +62,18 @@ namespace Assets.Grass
             GrassEntitiesWithMaterials bilboardTurf = generateTurf(billboardGenerator);
             var splat = _grassInstanceContainer.AddGrassEntities(bilboardTurf);
 
-            _grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._WindDirection, new Vector4(1,0,0,0).normalized);
+            //_grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._WindDirection, new Vector4(1,0,0,0).normalized);
+            _grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._BendingStrength, 0.0f);
         }
 
         private GrassEntitiesWithMaterials generateTurf(GrassBillboardGenerator billboardGenerator)
         {
             var meshGenerator = new GrassMeshGenerator();
             var mesh = meshGenerator.GetGrassBillboardMesh(0, 1);
-            return  new GrassEntitiesWithMaterials(billboardGenerator.XgenerateTriangleTurf(), BillboardMaterial, mesh);
+            var xgenerateTriangleTurf = billboardGenerator.XgenerateTriangleTurf(); //todo : use grass entities set and rotate
+            xgenerateTriangleTurf.Rotation = (MyMathUtils.DegToRad(new Vector3(0, 90, 0)));
+            //xgenerateTriangleTurf.Position = new Vector3(2,2,2);
+            return  new GrassEntitiesWithMaterials(xgenerateTriangleTurf.Entities, BillboardMaterial, mesh);
         }
 
         static float a = 0;
@@ -88,13 +93,13 @@ namespace Assets.Grass
 
             if (Input.GetKey(KeyCode.Q))
             {
-                _grassInstanceContainer.SetGlobalUniform("_BendingStrength", windStrength);
+                _grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._BendingStrength, windStrength);
                 windStrength += 0.1f;
                 windStrength = Mathf.Clamp01(windStrength);
             }
             if (Input.GetKey(KeyCode.W))
             {
-                _grassInstanceContainer.SetGlobalUniform("_BendingStrength", windStrength);
+                _grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._BendingStrength, windStrength);
                 windStrength -= 0.1f;
                 windStrength = Mathf.Clamp01(windStrength);
             }

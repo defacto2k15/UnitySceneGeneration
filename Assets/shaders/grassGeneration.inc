@@ -59,10 +59,9 @@ half4 assertNotZero(half4 inVal){
 }
 
 // returns values from -1 to 1
-half generateRandomWindMoveMultiplier( half bendingStrength ){
+half generateRandomWindMoveMultiplier( half bendingStrength, half randSeed ){
 	half currentNoiseValue = noise1D(_Time[3]);
-	half randomSinusDegreeOffsetAccordingToPosition 
-		= 0;//rand((UNITY_MATRIX_T_MV[0][0]+UNITY_MATRIX_T_MV[1][1]+UNITY_MATRIX_T_MV[2][2]+UNITY_MATRIX_T_MV[3][3]));
+	half randomSinusDegreeOffsetAccordingToPosition = randSeed*10;
 	half randomNoiseMultiplier = lerp(0.8, 1.2, currentNoiseValue);
 	half bendStrengthMultiplier = lerp(0.4, 0.6, sin(pow(bendingStrength,2) * fPI()));  
 	half frequencyMultiplier = lerp(0.5, 1.5, pow(bendingStrength,2));
@@ -71,11 +70,11 @@ half generateRandomWindMoveMultiplier( half bendingStrength ){
 }
 
 // first element is xStrength, second is yStrength. Each strength has values from -1 to 1
-half2 generateStrengths( half l_BendingStrength, half l_InitialBendingValue, half l_PlantBendingStiffness, half4 l_WindDirection, half4 l_PlantDirection){
+half2 generateStrengths( half l_BendingStrength, half l_InitialBendingValue, half l_PlantBendingStiffness, half4 l_WindDirection, half4 l_PlantDirection, half l_RandSeed){
 		l_WindDirection = assertNotZero(l_WindDirection);
 		l_PlantDirection = assertNotZero(l_PlantDirection);
 
-		half randomWindMultiplier =  generateRandomWindMoveMultiplier(l_BendingStrength);
+		half randomWindMultiplier =  generateRandomWindMoveMultiplier(l_BendingStrength, l_RandSeed);
 		half xBendStrength = remapNeg(calculateXBendStrength(l_BendingStrength, l_WindDirection, l_PlantDirection, l_InitialBendingValue, l_PlantBendingStiffness));
 		xBendStrength *= ( 1 + 0.2* randomWindMultiplier ); 
 

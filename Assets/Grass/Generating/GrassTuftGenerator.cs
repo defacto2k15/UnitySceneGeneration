@@ -40,6 +40,7 @@ namespace Assets.Grass
                 grassEntity.AddUniform(GrassShaderUniformName._PlantBendingStiffness, RandomTuftGenerator.GetPlantBendingStiffness(basePlantBendingStiffness) );
                 grassEntity.AddUniform(GrassShaderUniformName._InitialBendingValue, RandomTuftGenerator.GetPlantBendingValue(basePlantBendingValue) );
                 grassEntity.AddUniform(GrassShaderUniformName._Color, RandomGrassGenerator.GetGrassColor(tuftHue));
+                grassEntity.AddUniform(GrassShaderUniformName._RandSeed, UnityEngine.Random.value );
                 entities.Add(grassEntity);
             }
 

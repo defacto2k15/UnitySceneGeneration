@@ -15,5 +15,21 @@ namespace Assets.Utils
             UtilsGameObject.SigletonObject.transform.localScale = scale;
             return UtilsGameObject.SigletonObject.transform.localToWorldMatrix;
         }
+
+        public static List<MyTransformTriplet> MakeParentChildTransformations(MyTransformTriplet parent, List<MyTransformTriplet> children)
+        {
+            parent.SetTransformTo(UtilsGameObject.SigletonObject.transform);
+            SetChildrenTransform(children);
+            return UtilsGameObject.GetChildren(children.Count).Select(c =>  MyTransformTriplet.FromGlobalTransform(c.transform)).ToList();
+        }
+
+        private static void SetChildrenTransform(List<MyTransformTriplet> childrenTransform)
+        {
+            var childrenList = UtilsGameObject.GetChildren(childrenTransform.Count);
+            for (int i = 0; i < childrenList.Count; i++)
+            {
+                childrenTransform[i].SetTransformTo(childrenList[i].transform);
+            }
+        }
     }
 }

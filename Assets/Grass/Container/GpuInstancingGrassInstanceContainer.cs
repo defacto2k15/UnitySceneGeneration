@@ -75,9 +75,9 @@ namespace Assets.Grass.Container
             ForeachObject(aGrassPack => aGrassPack.MyBlock.AddSingleVectorArray(name, value));
         }
 
-        public void SetGlobalUniform(string name, float value)
+        public void SetGlobalUniform(GrassShaderUniformName name, float value)
         {
-            ForeachObject(aGrassPack => aGrassPack.MyBlock.AddGlobalUniform(name, value));
+            ForeachObject(aGrassPack => aGrassPack.MyBlock.AddGlobalUniform(name.ToString(), value));
         }
 
         public void SetGlobalUniform(GrassShaderUniformName name, Vector4 value)

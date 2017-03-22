@@ -14,6 +14,7 @@ namespace Assets.Grass
 		_WindDirection,
 		_PlantDirection,
         _MinUv,
-        _MaxUv
+        _MaxUv,
+        _RandSeed
     }
 }

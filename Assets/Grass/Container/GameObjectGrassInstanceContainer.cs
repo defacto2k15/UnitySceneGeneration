@@ -29,9 +29,9 @@ namespace Assets.Grass.Container
             ForeachObject((aObject) => aObject.GetComponent<Renderer>().material.SetColor(name, value));
         }
 
-        public void SetGlobalUniform(string name, float value)
+        public void SetGlobalUniform(GrassShaderUniformName name, float value)
         {
-            ForeachObject((aObject) => aObject.GetComponent<Renderer>().material.SetFloat(name, value));
+            ForeachObject((aObject) => aObject.GetComponent<Renderer>().material.SetFloat(name.ToString(), value));
         }
 
         public void SetGlobalUniform(GrassShaderUniformName name, Vector4 value)

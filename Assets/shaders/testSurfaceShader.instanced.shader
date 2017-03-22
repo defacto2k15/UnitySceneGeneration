@@ -7,6 +7,7 @@ Shader "Custom/testSurfaceShader23.Instanced" {
 		_PlantBendingStiffness("PlantBendingStiffness", Range(0,1)) = 0.5
 		_WindDirection("WindDirection", Vector) = (0.0,0.0, 0.0, 0.0)
 		_PlantDirection("PlantDirection", Vector) = (0.0,0.0, 0.0, 0.0)
+		_RandSeed("RandSeed", Range(0,1)) = 0
 	}
 	SubShader {
 		Tags { "RenderType"="Opaque" }
@@ -36,6 +37,7 @@ Shader "Custom/testSurfaceShader23.Instanced" {
 			UNITY_DEFINE_INSTANCED_PROP(fixed, _PlantBendingStiffness) 
 			UNITY_DEFINE_INSTANCED_PROP(fixed4, _WindDirection) 
 			UNITY_DEFINE_INSTANCED_PROP(fixed4, _PlantDirection) 
+			UNITY_DEFINE_INSTANCED_PROP(half, _RandSeed) 
 		UNITY_INSTANCING_CBUFFER_END
 
 		void vert(inout appdata_full v, out Input o){
@@ -45,7 +47,8 @@ Shader "Custom/testSurfaceShader23.Instanced" {
 				UNITY_ACCESS_INSTANCED_PROP(_PlantBendingStiffness), 
 				UNITY_ACCESS_INSTANCED_PROP(_WindDirection), 
 				UNITY_ACCESS_INSTANCED_PROP(_PlantDirection),
-				UNITY_ACCESS_INSTANCED_PROP(_Color));
+				UNITY_ACCESS_INSTANCED_PROP(_Color),
+				UNITY_ACCESS_INSTANCED_PROP(_RandSeed) );
 		}
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {

@@ -6,6 +6,7 @@
 		_PlantBendingStiffness("PlantBendingStiffness", Range(0,1)) = 0.5
 		_WindDirection("WindDirection", Vector) = (0.0,0.0, 0.0, 0.0)
 		_PlantDirection("PlantDirection", Vector) = (0.0,0.0, 0.0, 0.0)
+		_RandSeed("RandSeed", Range(0,1)) = 0
 	}
 	SubShader {
 		Tags { "RenderType"="Opaque" }
@@ -30,10 +31,11 @@
 		half4 _WindDirection;
 		half4 _PlantDirection; 
 		fixed4 _Color;
+		half _RandSeed;
 		
 
 		void vert(inout appdata_full v, out Input o){
-			grass_vert(v, o, _BendingStrength, _InitialBendingValue, _PlantBendingStiffness, _WindDirection, _PlantDirection, _Color);
+			grass_vert(v, o, _BendingStrength, _InitialBendingValue, _PlantBendingStiffness, _WindDirection, _PlantDirection, _Color, _RandSeed);
 		}  
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {

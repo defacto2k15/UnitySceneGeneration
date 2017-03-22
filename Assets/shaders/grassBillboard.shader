@@ -11,6 +11,7 @@
 		_PlantDirection("PlantDirection", Vector) = (0.0,0.0, 0.0, 0.0)
 		_MinUv("MinUv", float) = 0
 		_MaxUv("MaxUv", float) = 0.5
+		_RandSeed("RandSeed", float) = 0
     }
     SubShader
     {
@@ -39,6 +40,7 @@
 		fixed4 _Color;
 		float _MinUv;
 		float _MaxUv;
+		float _RandSeed;
  
         struct Input {
             float2 uv_MainTex;
@@ -48,7 +50,7 @@
 		void vert(inout appdata_full v, out Input o){
 			UNITY_INITIALIZE_OUTPUT(Input, o);
 			float l = v.vertex.y; // height of vertex from 0 to 1
-			half2 strengths = generateStrengths( _BendingStrength, _InitialBendingValue, _PlantBendingStiffness, _WindDirection, _PlantDirection);
+			half2 strengths = generateStrengths( _BendingStrength, _InitialBendingValue, _PlantBendingStiffness, _WindDirection, _PlantDirection, _RandSeed);
 			half xBendStrength = strengths.x;
 			half yBendStrength = strengths.y;
 
