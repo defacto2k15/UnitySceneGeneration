@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Assets.Grass.Billboard;
 using Assets.Grass.Generating;
 using Assets.Grass.Placing;
 using Assets.Utils;
@@ -42,6 +43,25 @@ namespace Assets.Grass
                 outList.AddRange(entitiesSet.Entities);
             }
             return new GrassEntitiesWithMaterials(outList, material, mesh);
+        }
+
+
+        public GrassEntitiesWithMaterials GenerateUniformRectangeBillboardGrass(Material material, IGrassPlacer placer, int lodLevel)
+        {
+            List<GrassEntity> createdEntities = new List<GrassEntity>();
+            var billboardGenerator = new GrassBillboardGenerator();
+
+            var meshGenerator = new GrassMeshGenerator();
+            var mesh = meshGenerator.GetGrassBillboardMesh(0, 1);
+            for (int i = 0; i < 5; i++)
+            {
+                var triangleTurf = billboardGenerator.GenerateTriangleTurf(); //todo : use grass entities set and rotate
+                triangleTurf.Rotation = (MyMathUtils.DegToRad(new Vector3(0, UnityEngine.Random.Range(0, 360), 0)));
+                placer.Set(triangleTurf);
+                createdEntities.AddRange(triangleTurf.Entities);
+            }
+
+            return  new GrassEntitiesWithMaterials(createdEntities, material, mesh);
         }
 
         public GrassEntitiesWithMaterials GenerateLineGrass(Material material)

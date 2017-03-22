@@ -45,32 +45,34 @@ namespace Assets.Grass
             var maxLodLevel = 5;
             var singleLevelDistance = 20;
             var noChangeMargin = 4;
-            //_manager = new GrassLodManager(new LodLevelResolver(maxLodLevel, singleLevelDistance, noChangeMargin),
-            //    new LambdaGrassSplatsProvider((downLeftPointArg, splatSizeArg, lodLevel) =>
-            //        _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeSingleGrass(material,
-            //            new UniformRectangleGrassPlacer(
-            //                new Vector2(downLeftPointArg.x, downLeftPointArg.z),
-            //                new Vector2(downLeftPointArg.x, downLeftPointArg.z) + splatSizeArg), lodLevel))),
-            //    terrainSize, splatSize);  
+            _manager = new GrassLodManager(new LodLevelResolver(maxLodLevel, singleLevelDistance, noChangeMargin),
+                new LambdaGrassSplatsProvider((downLeftPointArg, splatSizeArg, lodLevel) =>
+                    _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeBillboardGrass(BillboardMaterial,
+                        new UniformRectangleGrassPlacer(
+                            new Vector2(downLeftPointArg.x, downLeftPointArg.z),
+                            new Vector2(downLeftPointArg.x, downLeftPointArg.z) + splatSizeArg), lodLevel))),
+                terrainSize, splatSize);  
 
 
             //grassSplat = _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeSingleGrass(material,
             //    new UniformRectangleGrassPlacer(Vector2.zero, new Vector2(10, 20)), 0));
 
 
-            GrassBillboardGenerator billboardGenerator = new GrassBillboardGenerator();
-            GrassEntitiesWithMaterials bilboardTurf = generateTurf(billboardGenerator);
-            var splat = _grassInstanceContainer.AddGrassEntities(bilboardTurf);
+            //GrassBillboardGenerator billboardGenerator = new GrassBillboardGenerator();
+            //GrassEntitiesWithMaterials bilboardTurf = generateTurf(billboardGenerator);
+            //var splat = _grassInstanceContainer.AddGrassEntities(bilboardTurf);
 
             //_grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._WindDirection, new Vector4(1,0,0,0).normalized);
             _grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._BendingStrength, 0.0f);
+
+            _manager.UpdateLod(Vector3.zero);
         }
 
         private GrassEntitiesWithMaterials generateTurf(GrassBillboardGenerator billboardGenerator)
         {
             var meshGenerator = new GrassMeshGenerator();
             var mesh = meshGenerator.GetGrassBillboardMesh(0, 1);
-            var xgenerateTriangleTurf = billboardGenerator.XgenerateTriangleTurf(); //todo : use grass entities set and rotate
+            var xgenerateTriangleTurf = billboardGenerator.GenerateTriangleTurf(); //todo : use grass entities set and rotate
             xgenerateTriangleTurf.Rotation = (MyMathUtils.DegToRad(new Vector3(0, 90, 0)));
             //xgenerateTriangleTurf.Position = new Vector3(2,2,2);
             return  new GrassEntitiesWithMaterials(xgenerateTriangleTurf.Entities, BillboardMaterial, mesh);
