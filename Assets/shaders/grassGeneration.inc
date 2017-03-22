@@ -41,7 +41,7 @@ float calculateXBendStrength( half inWindValue, half4 windDirection, half4 plant
 // inWindValue - value from 0 to 1
 // returns value from 0 to 1
 float calculateYBendStrength( half inWindValue, half4 windDirection, half4 plantDirection ){
-	half directionCoefficient = sqrt(generateDirectionCoef( windDirection, plantDirection.yxzw)); //rotated as we check if wind is blowing on side
+	half directionCoefficient = sqrt(generateDirectionCoef( windDirection, plantDirection.zyxw)); //rotated as we check if wind is blowing on side
 	half normalized = remap(inWindValue * directionCoefficient);
 	// now normalized has value from -1 to 1, which also sets the direction of bend
 
@@ -55,18 +55,14 @@ float bendingAngle(float bendStrengthValue ){
 }
 
 half4 assertNotZero(half4 inVal){
-	if( inVal.x == 0 && inVal.y == 0 && inVal.z == 0 && inVal.w == 0 ){
-		return half4(0.01,0,0,0);
-	} else {
-		return inVal;
-	}
+	return normalize(max(inVal, half4(0.01, 0.01, 0.01, 0)));
 }
 
 // returns values from -1 to 1
 half generateRandomWindMoveMultiplier( half bendingStrength ){
 	half currentNoiseValue = noise1D(_Time[3]);
 	half randomSinusDegreeOffsetAccordingToPosition 
-		= rand((UNITY_MATRIX_T_MV[0][0]+UNITY_MATRIX_T_MV[1][1]+UNITY_MATRIX_T_MV[2][2]+UNITY_MATRIX_T_MV[3][3]));
+		= 0;//rand((UNITY_MATRIX_T_MV[0][0]+UNITY_MATRIX_T_MV[1][1]+UNITY_MATRIX_T_MV[2][2]+UNITY_MATRIX_T_MV[3][3]));
 	half randomNoiseMultiplier = lerp(0.8, 1.2, currentNoiseValue);
 	half bendStrengthMultiplier = lerp(0.4, 0.6, sin(pow(bendingStrength,2) * fPI()));  
 	half frequencyMultiplier = lerp(0.5, 1.5, pow(bendingStrength,2));
@@ -74,7 +70,7 @@ half generateRandomWindMoveMultiplier( half bendingStrength ){
 	return  sin(_Time[3] * frequencyMultiplier * 2 + randomSinusDegreeOffsetAccordingToPosition*30) * randomNoiseMultiplier*bendStrengthMultiplier ;
 }
 
-// first element is xStrength, second is yStrength
+// first element is xStrength, second is yStrength. Each strength has values from -1 to 1
 half2 generateStrengths( half l_BendingStrength, half l_InitialBendingValue, half l_PlantBendingStiffness, half4 l_WindDirection, half4 l_PlantDirection){
 		l_WindDirection = assertNotZero(l_WindDirection);
 		l_PlantDirection = assertNotZero(l_PlantDirection);

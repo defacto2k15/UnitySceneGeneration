@@ -83,7 +83,9 @@ namespace Assets.Grass
 
         public List<GrassShaderUniform<Vector4>> GetVector4Uniforms()
         {
-            return _vector4Uniforms;
+            return _vector4Uniforms
+                .Union( new List<GrassShaderUniform<Vector4>>(){ new GrassShaderUniform<Vector4>(GrassShaderUniformName._PlantDirection, PlantDirection)})
+                .ToList();
         }  
     }
 }

@@ -52,19 +52,32 @@
 			half xBendStrength = strengths.x;
 			half yBendStrength = strengths.y;
 
-			o.debColor = xBendStrength;
-			//v.vertex.z = calculateZ(xBendStrength, l);
-			//v.vertex.y = calculateY(xBendStrength, l);
-			//v.vertex.x = calculateX(yBendStrength, v.vertex.x, v.vertex.y);
+			half angle = lerp(-fPI()/2, fPI()/2, remap(xBendStrength));
+			// angle has values from -180 deg to 180 deg in radians
+
+			v.vertex.z = l * sin(angle);
+			v.vertex.y = abs(l * cos(angle));
+
+			// input v.vertex.x has  values from -0.5 to 0.5
+			half globalVertexX = _MinUv + (_MaxUv - _MinUv )* (v.vertex.x + 0.5);
+			// globalVertexX has values from 0 to 1;
+			globalVertexX += l*yBendStrength*0.6;
+
+			// now back : to values from -0.5 to 0.5 + bending offset
+			v.vertex.x = ((globalVertexX - _MinUv) / (_MaxUv - _MinUv)) - 0.5;
+			 
+			o.debColor = l * sin(angle/4);
+
+			v.normal = normalize(half3( 0, -cos(angle), sin(angle)));
 		}  
  
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
 			IN.uv_MainTex.x = lerp(_MinUv, _MaxUv, IN.uv_MainTex.x);	
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex);
-			c.g = 0;
-			c.b = 0;
-			c.r = IN.debColor;
+			//c.g = 0;
+			//c.b = 0;
+			//c.r = IN.debColor;
             o.Albedo = c.rgb;
             o.Metallic = 0.0;
             o.Smoothness = 0.5;

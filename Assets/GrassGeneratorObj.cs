@@ -53,13 +53,13 @@ namespace Assets.Grass
             //    terrainSize, splatSize);  
 
 
-            grassSplat = _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeSingleGrass(material,
-                new UniformRectangleGrassPlacer(Vector2.zero, new Vector2(10, 20)), 0));
+            //grassSplat = _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeSingleGrass(material,
+            //    new UniformRectangleGrassPlacer(Vector2.zero, new Vector2(10, 20)), 0));
 
 
-            //GrassBillboardGenerator billboardGenerator = new GrassBillboardGenerator();
-            //GrassEntitiesWithMaterials bilboardTurf = generateTurf(billboardGenerator);
-            //var splat = _grassInstanceContainer.AddGrassEntities(bilboardTurf);
+            GrassBillboardGenerator billboardGenerator = new GrassBillboardGenerator();
+            GrassEntitiesWithMaterials bilboardTurf = generateTurf(billboardGenerator);
+            var splat = _grassInstanceContainer.AddGrassEntities(bilboardTurf);
 
             _grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._WindDirection, new Vector4(1,0,0,0).normalized);
         }

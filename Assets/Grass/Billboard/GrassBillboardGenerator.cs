@@ -111,13 +111,13 @@ namespace Assets.Grass.Billboard
             };
         }
 
-        private GrassEntity XgenerateOnePlantSegment(float zEulerAngle, float xScale, float xPos,
+        private GrassEntity XgenerateOnePlantSegment(float yEulerAngle, float xScale, float xPos,
             float zPos, float minUv, float maxUv)
         {
 
             var obj = new GrassEntity
             {
-                Rotation = MyMathUtils.DegToRad(new Vector3(0,  zEulerAngle, 0)),
+                Rotation = MyMathUtils.DegToRad(new Vector3(0,  yEulerAngle, 0)),
                 Scale = new Vector3(xScale, 1, 1),
                 Position = new Vector3(xPos, 0, zPos)
             };
