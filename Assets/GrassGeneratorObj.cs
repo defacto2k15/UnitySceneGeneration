@@ -30,6 +30,8 @@ namespace Assets.Grass
             {
                 _grassInstanceContainer = new GpuInstancingGrassInstanceContainer();
                 shaderName = "Custom/testSurfaceShader23.Instanced";
+                BillboardMaterial.shader = Shader.Find("Custom/BillboardTransparent.Instanced");
+               // BillboardMaterial.shader = Shader.Find("Custom/testSurfaceShader23.Instanced");
             }
             else
             {
@@ -73,7 +75,7 @@ namespace Assets.Grass
             var meshGenerator = new GrassMeshGenerator();
             var mesh = meshGenerator.GetGrassBillboardMesh(0, 1);
             var xgenerateTriangleTurf = billboardGenerator.GenerateTriangleTurf(); //todo : use grass entities set and rotate
-            xgenerateTriangleTurf.Rotation = (MyMathUtils.DegToRad(new Vector3(0, 90, 0)));
+            //xgenerateTriangleTurf.Rotation = (MyMathUtils.DegToRad(new Vector3(0, 90, 0)));
             //xgenerateTriangleTurf.Position = new Vector3(2,2,2);
             return  new GrassEntitiesWithMaterials(xgenerateTriangleTurf.Entities, BillboardMaterial, mesh);
         }

@@ -26,10 +26,7 @@
         #pragma  surface surf Standard fullforwardshadows alpha:fade vertex:vert
         #pragma target 3.0
  
-
-		#include "common.inc"
-		#include "noise.inc"
-		#include "grassGeneration.inc"
+		#include "billboardGrassShader.inc"
 
         sampler2D _MainTex;
 		half _BendingStrength;
@@ -42,52 +39,13 @@
 		float _MaxUv;
 		float _RandSeed;
  
-        struct Input {
-            float2 uv_MainTex;
-			half debColor;
-        };
-	
 		void vert(inout appdata_full v, out Input o){
-			UNITY_INITIALIZE_OUTPUT(Input, o);
-			float l = v.vertex.y; // height of vertex from 0 to 1
-			half2 strengths = generateStrengths( _BendingStrength, _InitialBendingValue, _PlantBendingStiffness, _WindDirection, _PlantDirection, _RandSeed);
-			half xBendStrength = strengths.x;
-			half yBendStrength = strengths.y;
-
-			half angle = lerp(-fPI()/2, fPI()/2, remap(xBendStrength));
-			// angle has values from -180 deg to 180 deg in radians
-
-			v.vertex.z = l * sin(angle);
-			v.vertex.y = abs(l * cos(angle));
-
-			// input v.vertex.x has  values from -0.5 to 0.5
-			half globalVertexX = _MinUv + (_MaxUv - _MinUv )* (v.vertex.x + 0.5);
-			// globalVertexX has values from 0 to 1;
-			globalVertexX += l*yBendStrength*0.6;
-
-			// now back : to values from -0.5 to 0.5 + bending offset
-			v.vertex.x = ((globalVertexX - _MinUv) / (_MaxUv - _MinUv)) - 0.5;
-			 
-			o.debColor = l * sin(angle/4);
-
-			v.normal = normalize(half3( 0, -cos(angle), sin(angle)));
+			billboard_vert(v,o ,_BendingStrength, _InitialBendingValue, _PlantBendingStiffness, _WindDirection, _PlantDirection, _RandSeed, _MinUv, _MaxUv);
 		}  
  
-        void surf (Input IN, inout SurfaceOutputStandard o)
+        void surf (Input IN, inout SurfaceOutputStandard o)  
         {
-			IN.uv_MainTex.x = lerp(_MinUv, _MaxUv, IN.uv_MainTex.x);	
-            fixed4 c = tex2D (_MainTex, IN.uv_MainTex);
-			//c.g = 0;
-			//c.b = 0;
-			//c.r = IN.debColor;
-            o.Albedo = c.rgb;
-            o.Metallic = 0.0;
-            o.Smoothness = 0.5;
-			if( IN.uv_MainTex.y > 0.95 ){
-				o.Alpha = 0.0;
-			} else {
-				o.Alpha = c.a;
-			}
+			billboard_surf(IN, o, _MainTex, _MinUv, _MaxUv);  
         }
         ENDCG
     }

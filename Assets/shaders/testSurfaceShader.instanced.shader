@@ -41,18 +41,11 @@ Shader "Custom/testSurfaceShader23.Instanced" {
 		UNITY_INSTANCING_CBUFFER_END
 
 		void vert(inout appdata_full v, out Input o){
-			grass_vert(v, o, 
-				UNITY_ACCESS_INSTANCED_PROP(_BendingStrength), 
-				UNITY_ACCESS_INSTANCED_PROP(_InitialBendingValue), 
-				UNITY_ACCESS_INSTANCED_PROP(_PlantBendingStiffness), 
-				UNITY_ACCESS_INSTANCED_PROP(_WindDirection), 
-				UNITY_ACCESS_INSTANCED_PROP(_PlantDirection),
-				UNITY_ACCESS_INSTANCED_PROP(_Color),
-				UNITY_ACCESS_INSTANCED_PROP(_RandSeed) );
+			UNITY_INITIALIZE_OUTPUT(Input, o);
 		}
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
-			grass_surf(IN, o, UNITY_ACCESS_INSTANCED_PROP(_Color)); 
+
 		}
 		ENDCG
 	}

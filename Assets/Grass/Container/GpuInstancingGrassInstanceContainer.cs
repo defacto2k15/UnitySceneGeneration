@@ -55,17 +55,14 @@ namespace Assets.Grass.Container
         {
             foreach (var aGrassPack in _grassPacks)
             {
-                foreach (var materialMeshPair in _grassPacks)
+                foreach (var packList in aGrassPack.Value.Values)
                 {
-                    foreach (var packList in materialMeshPair.Value.Values)
+                    foreach (var pack in packList)
                     {
-                        foreach (var pack in packList)
-                        {
-                            Graphics.DrawMeshInstanced(aGrassPack.Key.Mesh, 0, aGrassPack.Key.Material, pack.MaticesArray, pack.InstancesCount, pack.MyBlock.Block,
-                                pack.CastShadows, false, 0, null);
-                        }
+                        Graphics.DrawMeshInstanced(aGrassPack.Key.Mesh, 0, aGrassPack.Key.Material, pack.MaticesArray, pack.InstancesCount, pack.MyBlock.Block,
+                            pack.CastShadows, false, 0, null);
                     }
-                }
+                }   
             }
         }
 

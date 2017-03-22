@@ -53,7 +53,7 @@ namespace Assets.Grass
 
             var meshGenerator = new GrassMeshGenerator();
             var mesh = meshGenerator.GetGrassBillboardMesh(0, 1);
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 75; i++)
             {
                 var triangleTurf = billboardGenerator.GenerateTriangleTurf(); //todo : use grass entities set and rotate
                 triangleTurf.Rotation = (MyMathUtils.DegToRad(new Vector3(0, UnityEngine.Random.Range(0, 360), 0)));

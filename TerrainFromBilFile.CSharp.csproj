@@ -128,6 +128,7 @@
     <Compile Include="Assets\Utils\UtilsGameObject.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\shaders\grassBillboard.instanced.shader" />
     <None Include="Assets\shaders\grassBillboard.shader" />
     <None Include="Assets\shaders\instanced.shader" />
     <None Include="Assets\shaders\myShader1.shader" />
@@ -137,6 +138,7 @@
     <None Include="Assets\shaders\testSurfaceShader.shader" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\shaders\billboardGrassShader.inc" />
     <Content Include="Assets\shaders\common.inc" />
     <Content Include="Assets\shaders\grassGeneration.inc" />
     <Content Include="Assets\shaders\noise.inc" />
