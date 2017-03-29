@@ -11,4 +11,12 @@
 	half remap(half x){ // from (-1,1) to (0,1)
 		return (x+1)/2;
 	}
+
+	half4 assertNotZero(half4 inVal){
+		return normalize(max(inVal, half4(0.01, 0.01, 0.01, 0)));
+	}
+
+	half invLerp(half min, half max, half value){
+		return clamp((value - min) / (max-min),0,1);
+	}
 #endif
