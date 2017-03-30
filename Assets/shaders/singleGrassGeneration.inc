@@ -27,8 +27,9 @@ half3 calculateNormal(half yPos, half zPos ){
 			half xBendStrength = strengths.x;
 			half yBendStrength = strengths.y;
 
-			v.vertex.z = calculateZ(xBendStrength, l);
-			v.vertex.y = calculateY(xBendStrength, l);
+			
+			v.vertex.z = calculateZ(xBendStrength, l); //forth-back bending
+			v.vertex.y = calculateY(xBendStrength, l); // top-down bending
 			v.vertex.x = calculateX(yBendStrength, v.vertex.x, v.vertex.y);
 
 			// calculating normals

@@ -21,6 +21,7 @@ namespace Assets.Grass
         private IGrassInstanceContainer _grassInstanceContainer;
         public Material BillboardMaterial;
         public Material ShellMaterial;
+        public Material GrassBillboardGeneratorMaterial;
 
         private void Start()
         {
@@ -31,13 +32,14 @@ namespace Assets.Grass
             {
                 _grassInstanceContainer = new GpuInstancingGrassInstanceContainer();
                 shaderName = "Custom/testSurfaceShader23.Instanced";
-                BillboardMaterial.shader = Shader.Find("Custom/BillboardTransparent.Instanced");
-               // BillboardMaterial.shader = Shader.Find("Custom/testSurfaceShader23.Instanced");
+                //BillboardMaterial.shader = Shader.Find("Custom/BillboardTransparent.Instanced");
+                BillboardMaterial.shader = Shader.Find("Custom/testSurfaceShader23.Instanced");
             }
             else
             {
                 _grassInstanceContainer = new GameObjectGrassInstanceContainer();
                 shaderName = "Custom/testSurfaceShader23";
+                BillboardMaterial.shader = Shader.Find(shaderName);
             }
 
             var material = new Material(Shader.Find(shaderName));
@@ -48,13 +50,13 @@ namespace Assets.Grass
             var maxLodLevel = 5;
             var singleLevelDistance = 20;
             var noChangeMargin = 4;
-            //_manager = new GrassLodManager(new LodLevelResolver(maxLodLevel, singleLevelDistance, noChangeMargin),
-            //    new LambdaGrassSplatsProvider((downLeftPointArg, splatSizeArg, lodLevel) =>
-            //        _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeBillboardGrass(BillboardMaterial,
-            //            new UniformRectangleGrassPlacer(
-            //                new Vector2(downLeftPointArg.x, downLeftPointArg.z),
-            //                new Vector2(downLeftPointArg.x, downLeftPointArg.z) + splatSizeArg), lodLevel))),
-            //    terrainSize, splatSize);  
+            _manager = new GrassLodManager(new LodLevelResolver(maxLodLevel, singleLevelDistance, noChangeMargin),
+                new LambdaGrassSplatsProvider((downLeftPointArg, splatSizeArg, lodLevel) =>
+                    _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeSingleGrass(BillboardMaterial,
+                        new UniformRectangleGrassPlacer(
+                            new Vector2(downLeftPointArg.x, downLeftPointArg.z),
+                            new Vector2(downLeftPointArg.x, downLeftPointArg.z) + splatSizeArg), lodLevel))),
+                terrainSize, splatSize);  
 
 
             //grassSplat = _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeSingleGrass(material,
@@ -68,9 +70,9 @@ namespace Assets.Grass
             //_grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._WindDirection, new Vector4(1,0,0,0).normalized);
             //_grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._BendingStrength, 0.0f);
 
-            //_manager.UpdateLod(Vector3.zero);
+            _manager.UpdateLod(Vector3.zero);
 
-            generateShells();
+            //generateShells();
 
         }
 
@@ -88,8 +90,9 @@ namespace Assets.Grass
                 rend.material = ShellMaterial;
                 rend.material.SetFloat("_LayerHeight", i *(1 / (float)layersCount));
 
-                rend.material.SetFloat("_BendingStrength", 0.8f);
+                rend.material.SetFloat("_BendingStrength", 0.2f);
                 rend.material.SetVector("_WindDirection", new Vector4(1,1,1,1));
+                rend.material.SetFloat("__Scale", 30.0f);
                 shellObj.AddComponent<MeshFilter>().mesh = plane.GetComponent<MeshFilter>().mesh;
             }
 
@@ -147,7 +150,7 @@ namespace Assets.Grass
                 //_manager.UpdateLod(new Vector3(0,0,0));
                 //windStrength = 2;
             }
-            //_grassInstanceContainer.Draw();
+            _grassInstanceContainer.Draw();
         }
 
         Vector4 GetWindVector(float angle)

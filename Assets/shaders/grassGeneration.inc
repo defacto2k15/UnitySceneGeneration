@@ -54,10 +54,6 @@ float bendingAngle(float bendStrengthValue ){
 	return radians(90 - lerp(-90,90,bendStrengthValue));
 }
 
-half4 assertNotZero(half4 inVal){
-	return normalize(max(inVal, half4(0.01, 0.01, 0.01, 0)));
-}
-
 // returns values from -1 to 1
 half generateRandomWindMoveMultiplier( half bendingStrength, half randSeed ){
 	half currentNoiseValue = noise1D(_Time[3]);

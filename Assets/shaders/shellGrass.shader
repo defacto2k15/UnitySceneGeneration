@@ -5,6 +5,7 @@ Shader "Custom/shellGrass" {
 		_LayerHeight("LayerHeight", Range(0,1)) = 0
 		_WindDirection("WindDirection", Vector) = (0.0,0.0, 0.0, 0.0)
 		_BendingStrength ("BendingStrength", Range(0,1)) = 0.0
+		_Scale ("Scale", Range(1,200)) = 30.0
 	}
 	SubShader {
         Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
@@ -25,6 +26,7 @@ Shader "Custom/shellGrass" {
 		half _LayerHeight;
 		half4 _WindDirection;
 		half _BendingStrength;
+		half _Scale;
 
 		#include "noise.inc"
 		#include "color.inc"
@@ -40,7 +42,6 @@ Shader "Custom/shellGrass" {
 			half3 globalVertexPosition = mul (unity_ObjectToWorld, v.vertex).xyz;
 			globalVertexPosition.y -= _LayerHeight*grassHeight; //todo. At final version height will be changed by normals, so this calculation wont be needed
 
-
 			o.distanceToCamera = distance(_WorldSpaceCameraPos, globalVertexPosition);
 		}  
 
@@ -52,8 +53,8 @@ Shader "Custom/shellGrass" {
 
 			float hue = lerp(0.25, 0.4, hueBase);
 			float saturation = lerp(0.7, 0.9, saturationBase);
-			float value = lerp(0.2, 0.5, valueBase);
-
+			float value = lerp(0.2, 0.5, valueBase); 
+			   
 			return HSVtoRGB(float3(hue, saturation, value) );
 		}
 
@@ -94,7 +95,7 @@ Shader "Custom/shellGrass" {
 			half2 origPos = (IN.pos + half2(5,5)) / 10;  
 			half2 pos = origPos; // pos has values from 0 to 1 now
 
-			half scale = 30; // number of cells at on side
+			half scale = _Scale; // def 30; // number of cells at on side
 
 			half pointSize = getPointSize(_LayerHeight, scale, IN.distanceToCamera); 
 			float margin = 0.1;

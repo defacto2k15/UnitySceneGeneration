@@ -9,6 +9,12 @@ half rand(half seed)
 	return frac(sin( seed ) * 43758.5453);
 }
 
+// return from -1 to 1
+half randNormH(half seed)
+{
+	return remapNeg(rand(seed));
+}
+
 // returns both values from -1 to 1
 half2 randNorm(half2 seed)
 {

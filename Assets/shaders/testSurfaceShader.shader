@@ -36,11 +36,11 @@
 
 		void vert(inout appdata_full v, out Input o){
 			grass_vert(v, o, _BendingStrength, _InitialBendingValue, _PlantBendingStiffness, _WindDirection, _PlantDirection, _Color, _RandSeed);
-		}  
+		} 
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
 			grass_surf(IN, o, _Color);  
-		}
+		} 
 		ENDCG
 	}
 	FallBack "Diffuse"

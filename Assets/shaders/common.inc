@@ -19,4 +19,12 @@
 	half invLerp(half min, half max, half value){
 		return clamp((value - min) / (max-min),0,1);
 	}
+
+	half weightedAverage( half4 values, half4 weights ){
+		return (values.x * weights.x +
+				values.y * weights.y +
+				values.z * weights.z +
+				values.w * weights.w) / 
+					( weights.x + weights.y + weights.z + weights.w);
+	}
 #endif
