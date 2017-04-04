@@ -22,6 +22,11 @@ namespace Assets.Grass
         public Material BillboardMaterial;
         public Material ShellMaterial;
         public Material GrassBillboardGeneratorMaterial;
+        public RenderTexture RenderTexture;
+        public Texture RealTexture;
+        public Material fragMaterial;
+
+        public GameObject RenderTextureGameObject;
 
         private void Start()
         {
@@ -70,10 +75,16 @@ namespace Assets.Grass
             //_grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._WindDirection, new Vector4(1,0,0,0).normalized);
             //_grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._BendingStrength, 0.0f);
 
-            _manager.UpdateLod(Vector3.zero);
+            //_manager.UpdateLod(Vector3.zero);
 
             //generateShells();
 
+            fragMaterial = new Material(Shader.Find("Custom/FragTestShader"));
+            generateBillboardTexture();
+
+            Material targerRenderTextureObjectMaterial = new Material(Shader.Find("Sprites/Default"));
+            targerRenderTextureObjectMaterial.SetTexture("_MainTex", RenderTexture);
+            RenderTextureGameObject.GetComponent<MeshRenderer>().material = targerRenderTextureObjectMaterial;
         }
 
         private void generateShells()
@@ -98,6 +109,11 @@ namespace Assets.Grass
 
         }
 
+        private void generateBillboardTexture()
+        {
+            Graphics.Blit(RealTexture, RenderTexture, fragMaterial);
+        }
+
         private GrassEntitiesWithMaterials generateTurf(GrassBillboardGenerator billboardGenerator)
         {
             var meshGenerator = new GrassMeshGenerator();
@@ -116,7 +132,6 @@ namespace Assets.Grass
 
         private void Update()
         {
-
             if (Input.GetKey(KeyCode.UpArrow))
             {
                 _grassInstanceContainer.SetGlobalColor("_Color", new Color( a%1.0f, (a +0.5f )%1.0f, (a+0.3f)%1.0f));
@@ -150,7 +165,7 @@ namespace Assets.Grass
                 //_manager.UpdateLod(new Vector3(0,0,0));
                 //windStrength = 2;
             }
-            _grassInstanceContainer.Draw();
+           // _grassInstanceContainer.Draw();
         }
 
         Vector4 GetWindVector(float angle)

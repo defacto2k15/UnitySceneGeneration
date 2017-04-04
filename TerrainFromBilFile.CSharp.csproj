@@ -129,6 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\shaders\billboardGrassGenerator.shader" />
+    <None Include="Assets\shaders\fragTest.shader" />
     <None Include="Assets\shaders\grassBillboard.instanced.shader" />
     <None Include="Assets\shaders\grassBillboard.shader" />
     <None Include="Assets\shaders\instanced.shader" />
@@ -140,6 +141,7 @@
     <None Include="Assets\shaders\testSurfaceShader.shader" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\shaders\billboardGrassGenerator.inc" />
     <Content Include="Assets\shaders\billboardGrassShader.inc" />
     <Content Include="Assets\shaders\color.inc" />
     <Content Include="Assets\shaders\common.inc" />
