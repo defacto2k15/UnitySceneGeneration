@@ -36,13 +36,26 @@ namespace Assets.Grass
             Random.InitState(DateTime.Now.Second);
             _rootInstanceContainer = new RootInstanceContainer();
             Material grassMaterial = new Material( Shader.Find("Custom/testSurfaceShader23.Instanced"));
-            var lodGroupProvider = new LodGroupsProvider(
+
+            var meshGenerator = new GrassMeshGenerator();
+
+            var grassTuftLodEntitySplatGenerator = new GrassTuftLodEntitySplatGenerator(
+                new GrassTuftGenerator(), 
+                new SingleGrassUniformPositionProvider(),
+                new GrassTuftAbstractSettingGenerator(),
+                _rootInstanceContainer,
+                meshGenerator,
+                grassMaterial);
+
+            var singleGrassLodEntitySplatGenerator = new SingleGrassLodEntitySplatGenerator(
                 new GrassSingleGenerator(),
                 new SingleGrassUniformPositionProvider(),
-                new GrassSingleSettingGenerator(),
+                new GrassSingleAbstractSettingGenerator(),
                 _rootInstanceContainer,
-                new GrassMeshGenerator(),
+                meshGenerator,
                 grassMaterial);
+
+            var lodGroupProvider = new LodGroupsProvider(new List<ILodEntitySplatGenerator> { singleGrassLodEntitySplatGenerator, grassTuftLodEntitySplatGenerator });
 
             var mapSize = new Vector2(100, 100);
             var splatSize = mapSize/10;
@@ -147,36 +160,34 @@ namespace Assets.Grass
         }
     }
 
-    internal class LodGroupsProvider : ILodGroupsProvider
+    internal class GrassTuftAbstractSettingGenerator : AbstractSettingGenerator
     {
-        private GrassSingleGenerator _grassSingleGenerator;
-        private IEntityPositionProvider _singleGrassUniformPositionProvider;
-        private GrassSingleSettingGenerator _grassSingleSettingGenerator;
-        private IGrassInstanceContainer _grassInstanceContainer;
-        private GrassMeshGenerator _meshGenerator;
-        private Material _grassMaterial;
-
-        public LodGroupsProvider(GrassSingleGenerator grassSingleGenerator, IEntityPositionProvider singleGrassUniformPositionProvider, GrassSingleSettingGenerator grassSingleSettingGenerator, IGrassInstanceContainer grassInstanceContainer, GrassMeshGenerator meshGenerator, Material grassMaterial)
+        public override void SetSettings(GrassEntitiesSet aGrass)
         {
-            _grassSingleGenerator = grassSingleGenerator;
-            _singleGrassUniformPositionProvider = singleGrassUniformPositionProvider;
-            _grassSingleSettingGenerator = grassSingleSettingGenerator;
-            _grassInstanceContainer = grassInstanceContainer;
-            _meshGenerator = meshGenerator;
-            _grassMaterial = grassMaterial;
+            var tuftHue = RandomGrassGenerator.GetHue();
+            var tuftValue = RandomGrassGenerator.GetValue();
+            var randomSaturation = RandomGrassGenerator.GetSaturation(); //todo use it
+            MyRange basePlantBendingStiffness = RandomTuftGenerator.GetBasePlantBendingStiffness();
+            MyRange basePlantBendingValue = RandomTuftGenerator.GetBasePlantBendingValue();
+            ForeachEntity(aGrass, c => c.AddUniform(GrassShaderUniformName._PlantBendingStiffness, RandomTuftGenerator.GetPlantBendingStiffness(basePlantBendingStiffness)));
+            ForeachEntity(aGrass, c => c.AddUniform(GrassShaderUniformName._InitialBendingValue, RandomTuftGenerator.GetPlantBendingValue(basePlantBendingValue)));
+            ForeachEntity(aGrass, c => c.AddUniform(GrassShaderUniformName._Color, RandomGrassGenerator.GetGrassColor(tuftHue)));
+            ForeachEntity(aGrass, c => c.AddUniform(GrassShaderUniformName._RandSeed, UnityEngine.Random.value));            
+        }
+    }
+
+    internal class LodGroupsProvider : ILodGroupsProvider //todo przenies
+    {
+        private readonly List<ILodEntitySplatGenerator> _lodEntitySplatGenerators;
+
+        public LodGroupsProvider(List<ILodEntitySplatGenerator> lodEntitySplatGenerators)
+        {
+            _lodEntitySplatGenerators = lodEntitySplatGenerators;
         }
 
         public LodGroup GenerateLodGroup(MapAreaPosition position, int newLodLevel)
         {
-            return new LodGroup(
-                new List<LodEntitySplat>
-                {
-                    new LodEntitySplat(position, 
-                        new SingleGrassLodResolver(),
-                        new SingleGrassEntitySplatGenerator(_grassSingleGenerator, _singleGrassUniformPositionProvider, _grassSingleSettingGenerator, _grassInstanceContainer, _meshGenerator, _grassMaterial ),
-                        newLodLevel
-)
-                }, newLodLevel, position );
+            return new LodGroup(_lodEntitySplatGenerators.Select(c => c.Generate(position, newLodLevel)).ToList(), newLodLevel, position);
         }
     }
 
@@ -187,6 +198,126 @@ namespace Assets.Grass
         {
             var t = Mathf.InverseLerp(Constants.MIN_GLOBAL_LOD, Constants.MAX_GLOBAL_LOD, globalLod);
             return (int)Mathf.Round(Mathf.Lerp(Constants.MIN_SINGLE_GRASS_LOD, Constants.MAX_SINGLE_GRASS_LOD, t));
+        }
+    }
+
+    internal class SingleGrassLodEntitySplatGenerator : ILodEntitySplatGenerator
+    {
+        private readonly GrassSingleGenerator _grassSingleGenerator;
+        private readonly IEntityPositionProvider _singleGrassUniformPositionProvider;
+        private readonly GrassSingleAbstractSettingGenerator _grassSingleAbstractSettingGenerator;
+        private readonly IGrassInstanceContainer _grassInstanceContainer;
+        private readonly GrassMeshGenerator _meshGenerator;
+        private readonly Material _grassMaterial;
+
+        public SingleGrassLodEntitySplatGenerator(GrassSingleGenerator grassSingleGenerator, IEntityPositionProvider singleGrassUniformPositionProvider, GrassSingleAbstractSettingGenerator grassSingleAbstractSettingGenerator, IGrassInstanceContainer grassInstanceContainer, GrassMeshGenerator meshGenerator, Material grassMaterial)
+        {
+            _grassSingleGenerator = grassSingleGenerator;
+            _singleGrassUniformPositionProvider = singleGrassUniformPositionProvider;
+            _grassSingleAbstractSettingGenerator = grassSingleAbstractSettingGenerator;
+            _grassInstanceContainer = grassInstanceContainer;
+            _meshGenerator = meshGenerator;
+            _grassMaterial = grassMaterial;
+        }
+
+        public LodEntitySplat Generate(MapAreaPosition position, int newLodLevel)
+        {
+            return new LodEntitySplat(position,
+                new SingleGrassLodResolver(),
+                new SingleGrassEntitySplatGenerator(_grassSingleGenerator, _singleGrassUniformPositionProvider,
+                    _grassSingleAbstractSettingGenerator, _grassInstanceContainer, _meshGenerator, _grassMaterial),
+                newLodLevel);
+        }
+    }
+
+    internal class GrassTuftLodEntitySplatGenerator : ILodEntitySplatGenerator
+    {
+        private readonly GrassTuftGenerator _grassTuftGenerator;
+        private readonly IEntityPositionProvider _grassTuftPositionProvider;
+        private readonly GrassTuftAbstractSettingGenerator _grassTuftAbstractSettingGenerator;
+        private readonly IGrassInstanceContainer _grassInstanceContainer;
+        private readonly GrassMeshGenerator _meshGenerator;
+        private readonly Material _grassTuftMaterial;
+
+        public GrassTuftLodEntitySplatGenerator(GrassTuftGenerator grassTuftGenerator, IEntityPositionProvider grassTuftPositionProvider, GrassTuftAbstractSettingGenerator grassTuftAbstractSettingGenerator, IGrassInstanceContainer grassInstanceContainer, GrassMeshGenerator meshGenerator, Material grassTuftMaterial)
+        {
+            this._grassTuftGenerator = grassTuftGenerator;
+            _grassTuftPositionProvider = grassTuftPositionProvider;
+            _grassTuftAbstractSettingGenerator = grassTuftAbstractSettingGenerator;
+            _grassInstanceContainer = grassInstanceContainer;
+            _meshGenerator = meshGenerator;
+            _grassTuftMaterial = grassTuftMaterial;
+        }
+
+
+        public LodEntitySplat Generate(MapAreaPosition position, int newLodLevel)
+        {
+            return new LodEntitySplat(position,
+                new SingleGrassLodResolver(), //its good for tuft
+                new GrassTuftEntitySplatGenerator(_grassTuftGenerator, _grassTuftPositionProvider, _grassTuftAbstractSettingGenerator, _grassInstanceContainer, _meshGenerator, _grassTuftMaterial),
+                newLodLevel);
+        }
+    }
+
+    internal class GrassTuftEntitySplatGenerator : IEntitySplatGenerator
+    {
+        private readonly GrassTuftGenerator _grassTuftGenerator;
+        private readonly IEntityPositionProvider _grassTuftPositionProvider;
+        private readonly GrassTuftAbstractSettingGenerator _grassTuftAbstractSettingGenerator;
+        private readonly IGrassInstanceContainer _grassInstanceContainer;
+        private readonly GrassMeshGenerator _meshGenerator;
+        private readonly Material _grassTuftMaterial;
+
+        public GrassTuftEntitySplatGenerator(GrassTuftGenerator grassTuftGenerator, IEntityPositionProvider grassTuftPositionProvider, GrassTuftAbstractSettingGenerator grassTuftAbstractSettingGenerator, IGrassInstanceContainer grassInstanceContainer, GrassMeshGenerator meshGenerator, Material grassTuftMaterial)
+        {
+            _grassTuftGenerator = grassTuftGenerator;
+            _grassTuftPositionProvider = grassTuftPositionProvider;
+            _grassTuftAbstractSettingGenerator = grassTuftAbstractSettingGenerator;
+            _grassInstanceContainer = grassInstanceContainer;
+            _meshGenerator = meshGenerator;
+            _grassTuftMaterial = grassTuftMaterial;
+        }
+
+        public IGrassSplat GenerateSplat(MapAreaPosition position, int entityLodLevel)
+        {
+            List<GrassEntitiesSet> singleEntities = new List<GrassEntitiesSet>();
+            for (int i = 0; i < 20; i++)
+            {
+                var aTuft = _grassTuftGenerator.CreateGrassTuft();
+                _grassTuftPositionProvider.SetPosition(aTuft, position);
+                _grassTuftAbstractSettingGenerator.SetSettings(aTuft);
+                if (entityLodLevel == 0)
+                {
+                    aTuft.EntitiesBeforeTransform.ForEach(c => c.AddUniform(GrassShaderUniformName._Color, new Vector4(99.0f, 0f, 0.0f, 1.0f)));
+                }
+                if (entityLodLevel == 1)
+                {
+                    aTuft.EntitiesBeforeTransform.ForEach(c => c.AddUniform(GrassShaderUniformName._Color, new Vector4(99.0f, 99.0f, 0.0f, 1.0f)));
+                }
+                if (entityLodLevel == 2)
+                {
+                    aTuft.EntitiesBeforeTransform.ForEach(c => c.AddUniform(GrassShaderUniformName._Color, new Vector4(99.0f, 99.0f, 99.0f, 1.0f)));
+                }
+                if (entityLodLevel == 3)
+                {
+                    aTuft.EntitiesBeforeTransform.ForEach(c => c.AddUniform(GrassShaderUniformName._Color, new Vector4(0.0f, 99.0f, 0.0f, 1.0f)));
+                }
+                if (entityLodLevel == 4)
+                {
+                    aTuft.EntitiesBeforeTransform.ForEach(c => c.AddUniform(GrassShaderUniformName._Color, new Vector4(0.0f, 99.0f, 99.0f, 1.0f)));
+                }
+                if (entityLodLevel == 5)
+                {
+                    aTuft.EntitiesBeforeTransform.ForEach(c => c.AddUniform(GrassShaderUniformName._Color, new Vector4(0.0f, 0.0f, 99.0f, 1.0f)));
+                }
+
+                singleEntities.Add(aTuft);
+            }
+            var bladeTriangleCount = (int)Mathf.Max(Constants.MAX_GRASS_MESH_LEVEL - entityLodLevel, Constants.MIN_GRASS_MESH_LEVEL);
+            Mesh mesh = _meshGenerator.GetGrassBladeMesh(bladeTriangleCount);
+            return _grassInstanceContainer.AddGrassEntities(
+                new GrassEntitiesWithMaterials(singleEntities.SelectMany(c => c.EntitiesAfterTransform).ToList(), _grassTuftMaterial, mesh,
+                    ContainerType.Instancing));
         }
     }
 }

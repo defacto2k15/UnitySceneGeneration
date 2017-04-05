@@ -2,9 +2,19 @@
 
 namespace Assets.Grass.Generating
 {
-    internal class GrassSingleSettingGenerator
+    abstract class AbstractSettingGenerator
     {
-        public void SetSettings(GrassEntitiesSet aGrass)
+        public abstract void SetSettings(GrassEntitiesSet aGrass);
+
+        protected void ForeachEntity(GrassEntitiesSet aGrass, Action<GrassEntity> method)
+        {
+            aGrass.EntitiesBeforeTransform.ForEach(method);
+        }
+    }
+
+    internal class GrassSingleAbstractSettingGenerator : AbstractSettingGenerator
+    {
+        public override void SetSettings(GrassEntitiesSet aGrass)
         {
             float plantBendingSiffness = RandomGrassGenerator.GetBendingStiffness();
             float initialBendingValue = RandomGrassGenerator.GetInitialBendingValue();
@@ -12,11 +22,6 @@ namespace Assets.Grass.Generating
             ForeachEntity(aGrass, grassEntity => grassEntity.AddUniform(GrassShaderUniformName._InitialBendingValue, initialBendingValue));
             ForeachEntity(aGrass, grassEntity => grassEntity.AddUniform(GrassShaderUniformName._Color, RandomGrassGenerator.GetGrassColor()));
             ForeachEntity(aGrass, grassEntity => grassEntity.AddUniform(GrassShaderUniformName._RandSeed, UnityEngine.Random.value));
-        }
-
-        private void ForeachEntity(GrassEntitiesSet aGrass, Action<GrassEntity> method)
-        {
-            aGrass.EntitiesBeforeTransform.ForEach(method);
         }
     }
 }

@@ -19,28 +19,18 @@ namespace Assets.Grass
             var anglesList = RandomTuftGenerator.GetRandomAngles(elementsCount, elementsRange.Max);
             float radiusFromCenter = 0.1f;
             List<GrassEntity> entities = new List<GrassEntity>();
-            var tuftHue = RandomGrassGenerator.GetHue();
-            var tuftValue = RandomGrassGenerator.GetValue();
-            var randomSaturation = RandomGrassGenerator.GetSaturation();
 
             foreach (var angle in anglesList)
             {
-                MyRange basePlantBendingStiffness = RandomTuftGenerator.GetBasePlantBendingStiffness();
-                MyRange basePlantBendingValue = RandomTuftGenerator.GetBasePlantBendingValue();
-
                 float radiousRandomOffset = RandomTuftGenerator.GetPositionOffset();
                 var grassEntity = new GrassEntity
                 {
                     Position =
                         new Vector3((radiusFromCenter+radiousRandomOffset)*(float) Math.Sin(angle), 0,
-                                    (radiusFromCenter+radiousRandomOffset)*(float) Math.Cos(angle)+90),
+                                    (radiusFromCenter + radiousRandomOffset) * (float)Math.Cos(angle + 90)),
                     Rotation = new Vector3(0,  angle, 0),
                     Scale = RandomGrassGenerator.GetScale(),
                };
-                grassEntity.AddUniform(GrassShaderUniformName._PlantBendingStiffness, RandomTuftGenerator.GetPlantBendingStiffness(basePlantBendingStiffness) );
-                grassEntity.AddUniform(GrassShaderUniformName._InitialBendingValue, RandomTuftGenerator.GetPlantBendingValue(basePlantBendingValue) );
-                grassEntity.AddUniform(GrassShaderUniformName._Color, RandomGrassGenerator.GetGrassColor(tuftHue));
-                grassEntity.AddUniform(GrassShaderUniformName._RandSeed, UnityEngine.Random.value );
                 entities.Add(grassEntity);
             }
 

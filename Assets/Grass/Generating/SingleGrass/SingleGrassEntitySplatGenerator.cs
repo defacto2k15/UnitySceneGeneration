@@ -12,16 +12,16 @@ namespace Assets.Grass.Generating
     {
         private readonly GrassSingleGenerator _entityGenerator;
         private readonly IEntityPositionProvider _positionProvider;
-        private readonly GrassSingleSettingGenerator _grassSingleSettingGenerator;
+        private readonly GrassSingleAbstractSettingGenerator _grassSingleAbstractSettingGenerator;
         private readonly IGrassInstanceContainer _grassInstanceContainer;
         private readonly GrassMeshGenerator _meshGenerator;
         private readonly Material _material;
 
-        public SingleGrassEntitySplatGenerator(GrassSingleGenerator entityGenerator, IEntityPositionProvider positionProvider, GrassSingleSettingGenerator grassSingleSettingGenerator, IGrassInstanceContainer grassInstanceContainer, GrassMeshGenerator meshGenerator, Material material)
+        public SingleGrassEntitySplatGenerator(GrassSingleGenerator entityGenerator, IEntityPositionProvider positionProvider, GrassSingleAbstractSettingGenerator grassSingleAbstractSettingGenerator, IGrassInstanceContainer grassInstanceContainer, GrassMeshGenerator meshGenerator, Material material)
         {
             this._entityGenerator = entityGenerator;
             this._positionProvider = positionProvider;
-            this._grassSingleSettingGenerator = grassSingleSettingGenerator;
+            this._grassSingleAbstractSettingGenerator = grassSingleAbstractSettingGenerator;
             this._grassInstanceContainer = grassInstanceContainer;
             _meshGenerator = meshGenerator;
             this._material = material;
@@ -34,7 +34,7 @@ namespace Assets.Grass.Generating
             {
                 var aGrass = _entityGenerator.CreateSingleGrass();
                 _positionProvider.SetPosition(aGrass, position);
-                _grassSingleSettingGenerator.SetSettings(aGrass);
+                _grassSingleAbstractSettingGenerator.SetSettings(aGrass);
                 if (entityLodLevel == 0)
                 {
                     aGrass.EntitiesBeforeTransform.ForEach(c => c.AddUniform(GrassShaderUniformName._DbgColor, new Vector4(99.0f, 0f, 0.0f, 1.0f))); 

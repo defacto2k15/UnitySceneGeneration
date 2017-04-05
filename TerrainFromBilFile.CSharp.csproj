@@ -108,6 +108,7 @@
     <Compile Include="Assets\Grass\Lod\IEntityLodResolver.cs" />
     <Compile Include="Assets\Grass\Lod\IEntitySplatGenerator.cs" />
     <Compile Include="Assets\Grass\Lod\ILodGroupsProvider.cs" />
+    <Compile Include="Assets\Grass\Lod\ILodEntitySplatGenerator.cs" />
     <Compile Include="Assets\Grass\Lod\LambdaLodGroupsProvider.cs" />
     <Compile Include="Assets\Grass\Lod\LodEntitySplat.cs" />
     <Compile Include="Assets\Grass\Lod\LodGroup.cs" />
@@ -159,6 +160,9 @@
     <Content Include="Assets\shaders\grassGeneration.inc" />
     <Content Include="Assets\shaders\noise.inc" />
     <Content Include="Assets\shaders\singleGrassGeneration.inc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\Grass\Generating\GrassTuft\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2012\UnityVS.CSharp.targets" />
 </Project>
