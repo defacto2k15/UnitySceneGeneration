@@ -79,19 +79,25 @@
   <ItemGroup>
     <Compile Include="Assets\Grass\Billboard\GrassBillboardGenerator.cs" />
     <Compile Include="Assets\Grass\Constants.cs" />
+    <Compile Include="Assets\Grass\ContainerType.cs" />
     <Compile Include="Assets\Grass\Container\GameObjectGrassInstanceContainer.cs" />
     <Compile Include="Assets\Grass\Container\GameObjectGrassSplat.cs" />
     <Compile Include="Assets\Grass\Container\GpuInstancingGrassInstanceContainer.cs" />
     <Compile Include="Assets\Grass\Container\GpuInstancingGrassSplat.cs" />
     <Compile Include="Assets\Grass\Container\IGrassInstanceContainer.cs" />
     <Compile Include="Assets\Grass\Container\IGrassSplat.cs" />
+    <Compile Include="Assets\Grass\Container\RootInstanceContainer.cs" />
     <Compile Include="Assets\Grass\Generating\GrassEntitiesSet.cs" />
     <Compile Include="Assets\Grass\Generating\GrassEntityGenerator.cs" />
     <Compile Include="Assets\Grass\Generating\GrassMeshGenerator.cs" />
     <Compile Include="Assets\Grass\Generating\GrassSingleGenerator.cs" />
+    <Compile Include="Assets\Grass\Generating\GrassSingleSettingGenerator.cs" />
     <Compile Include="Assets\Grass\Generating\GrassTuftGenerator.cs" />
+    <Compile Include="Assets\Grass\Generating\IEntityPositionProvider.cs" />
     <Compile Include="Assets\Grass\Generating\RandomGrassGenerator.cs" />
     <Compile Include="Assets\Grass\Generating\RandomTuftGenerator.cs" />
+    <Compile Include="Assets\Grass\Generating\SingleGrass\SingleGrassEntitySplatGenerator.cs" />
+    <Compile Include="Assets\Grass\Generating\SingleGrass\SingleGrassUniformPositionProvider.cs" />
     <Compile Include="Assets\Grass\GrassEntitiesWithMaterials.cs" />
     <Compile Include="Assets\Grass\GrassEntity.cs" />
     <Compile Include="Assets\Grass\GrassShaderUniform.cs" />
@@ -99,8 +105,12 @@
     <Compile Include="Assets\Grass\Instancing\GameObjectGrassInstanceGenerator.cs" />
     <Compile Include="Assets\Grass\Instancing\GpuInstancingGrassInstanceGenerator.cs" />
     <Compile Include="Assets\Grass\Lod\GrassLodManager.cs" />
-    <Compile Include="Assets\Grass\Lod\IGrassSplatsProvider.cs" />
-    <Compile Include="Assets\Grass\Lod\LambdaGrassSplatsProvider.cs" />
+    <Compile Include="Assets\Grass\Lod\IEntityLodResolver.cs" />
+    <Compile Include="Assets\Grass\Lod\IEntitySplatGenerator.cs" />
+    <Compile Include="Assets\Grass\Lod\ILodGroupsProvider.cs" />
+    <Compile Include="Assets\Grass\Lod\LambdaLodGroupsProvider.cs" />
+    <Compile Include="Assets\Grass\Lod\LodEntitySplat.cs" />
+    <Compile Include="Assets\Grass\Lod\LodGroup.cs" />
     <Compile Include="Assets\Grass\Lod\LodLevelResolver.cs" />
     <Compile Include="Assets\Grass\Placing\IGrassPlacer.cs" />
     <Compile Include="Assets\Grass\Placing\UniformRectangleGrassPlacer.cs" />
@@ -124,6 +134,7 @@
     <Compile Include="Assets\Utils\MyMathUtils.cs" />
     <Compile Include="Assets\Utils\MyRange.cs" />
     <Compile Include="Assets\Utils\MyTransformTriplet.cs" />
+    <Compile Include="Assets\Utils\MapAreaPosition.cs" />
     <Compile Include="Assets\Utils\TransformUtils.cs" />
     <Compile Include="Assets\Utils\UtilsGameObject.cs" />
   </ItemGroup>

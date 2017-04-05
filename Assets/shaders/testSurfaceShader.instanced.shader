@@ -8,6 +8,7 @@ Shader "Custom/testSurfaceShader23.Instanced" {
 		_WindDirection("WindDirection", Vector) = (0.0,0.0, 0.0, 0.0)
 		_PlantDirection("PlantDirection", Vector) = (0.0,0.0, 0.0, 0.0)
 		_RandSeed("RandSeed", Range(0,1)) = 0
+		_DbgColor("DgbColor", Vector) = (1.0,1.0, 1.0, 1.0)
 	}
 	SubShader {
 		Tags { "RenderType"="Opaque" }
@@ -38,14 +39,27 @@ Shader "Custom/testSurfaceShader23.Instanced" {
 			UNITY_DEFINE_INSTANCED_PROP(fixed4, _WindDirection) 
 			UNITY_DEFINE_INSTANCED_PROP(fixed4, _PlantDirection) 
 			UNITY_DEFINE_INSTANCED_PROP(half, _RandSeed) 
+			UNITY_DEFINE_INSTANCED_PROP(half4, _DbgColor) 
 		UNITY_INSTANCING_CBUFFER_END
 
 		void vert(inout appdata_full v, out Input o){
-			UNITY_INITIALIZE_OUTPUT(Input, o);
+			grass_vert(v, o, 
+				UNITY_ACCESS_INSTANCED_PROP(_BendingStrength), 
+				UNITY_ACCESS_INSTANCED_PROP(_InitialBendingValue), 
+				UNITY_ACCESS_INSTANCED_PROP(_PlantBendingStiffness), 
+				UNITY_ACCESS_INSTANCED_PROP(_WindDirection), 
+				UNITY_ACCESS_INSTANCED_PROP(_PlantDirection),
+				UNITY_ACCESS_INSTANCED_PROP(_Color),
+				UNITY_ACCESS_INSTANCED_PROP(_RandSeed), 1); 
+			half4 _Scale = half4(1,1,0,0);
+			//v.vertex = mul(UNITY_MATRIX_MVP, v.vertex*_Scale);
 		}
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
-
+			grass_surf(IN, o, UNITY_ACCESS_INSTANCED_PROP(_Color)); 
+			
+			half4 dbgColor = 	UNITY_ACCESS_INSTANCED_PROP(_DbgColor);
+			o.Albedo *= dbgColor;
 		}
 		ENDCG
 	}

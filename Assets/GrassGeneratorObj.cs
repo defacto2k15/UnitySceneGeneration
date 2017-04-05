@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Assets.Grass.Billboard;
 using Assets.Grass.Container;
+using Assets.Grass.Generating;
 using Assets.Grass.Instancing;
 using Assets.Grass.Lod;
 using Assets.Grass.Placing;
@@ -27,64 +29,28 @@ namespace Assets.Grass
         public Material fragMaterial;
 
         public GameObject RenderTextureGameObject;
+        public GameObject CameraGameObject;
 
         private void Start()
         {
             Random.InitState(DateTime.Now.Second);
+            _rootInstanceContainer = new RootInstanceContainer();
+            Material grassMaterial = new Material( Shader.Find("Custom/testSurfaceShader23.Instanced"));
+            var lodGroupProvider = new LodGroupsProvider(
+                new GrassSingleGenerator(),
+                new SingleGrassUniformPositionProvider(),
+                new GrassSingleSettingGenerator(),
+                _rootInstanceContainer,
+                new GrassMeshGenerator(),
+                grassMaterial);
 
-            string shaderName;
-            if (shouldUseInstancing)
-            {
-                _grassInstanceContainer = new GpuInstancingGrassInstanceContainer();
-                shaderName = "Custom/testSurfaceShader23.Instanced";
-                //BillboardMaterial.shader = Shader.Find("Custom/BillboardTransparent.Instanced");
-                BillboardMaterial.shader = Shader.Find("Custom/testSurfaceShader23.Instanced");
-            }
-            else
-            {
-                _grassInstanceContainer = new GameObjectGrassInstanceContainer();
-                shaderName = "Custom/testSurfaceShader23";
-                BillboardMaterial.shader = Shader.Find(shaderName);
-            }
-
-            var material = new Material(Shader.Find(shaderName));
-            var entitiesGenerator = new GrassEntityGenerator();
-
-            var terrainSize = new Vector2(100, 100);
-            var splatSize = new Vector2(10, 10);
-            var maxLodLevel = 5;
-            var singleLevelDistance = 20;
-            var noChangeMargin = 4;
-            _manager = new GrassLodManager(new LodLevelResolver(maxLodLevel, singleLevelDistance, noChangeMargin),
-                new LambdaGrassSplatsProvider((downLeftPointArg, splatSizeArg, lodLevel) =>
-                    _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeSingleGrass(BillboardMaterial,
-                        new UniformRectangleGrassPlacer(
-                            new Vector2(downLeftPointArg.x, downLeftPointArg.z),
-                            new Vector2(downLeftPointArg.x, downLeftPointArg.z) + splatSizeArg), lodLevel))),
-                terrainSize, splatSize);  
-
-
-            //grassSplat = _grassInstanceContainer.AddGrassEntities(entitiesGenerator.GenerateUniformRectangeSingleGrass(material,
-            //    new UniformRectangleGrassPlacer(Vector2.zero, new Vector2(10, 20)), 0));
-
-
-            //GrassBillboardGenerator billboardGenerator = new GrassBillboardGenerator();
-            //GrassEntitiesWithMaterials bilboardTurf = generateTurf(billboardGenerator);
-            //var splat = _grassInstanceContainer.AddGrassEntities(bilboardTurf);
-
-            //_grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._WindDirection, new Vector4(1,0,0,0).normalized);
-            //_grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._BendingStrength, 0.0f);
-
-            //_manager.UpdateLod(Vector3.zero);
-
-            //generateShells();
-
-            fragMaterial = new Material(Shader.Find("Custom/FragTestShader"));
-            generateBillboardTexture();
-
-            Material targerRenderTextureObjectMaterial = new Material(Shader.Find("Sprites/Default"));
-            targerRenderTextureObjectMaterial.SetTexture("_MainTex", RenderTexture);
-            RenderTextureGameObject.GetComponent<MeshRenderer>().material = targerRenderTextureObjectMaterial;
+            var mapSize = new Vector2(100, 100);
+            var splatSize = mapSize/10;
+            var singleLevelDistance = (int)splatSize.x*2;
+            var singleLevelMargin = 0.1f;
+            var lodMarginPowCoef = 0.8f;
+            _grassLodManager = new GrassLodManager(new LodLevelResolver(7, singleLevelDistance, singleLevelMargin, lodMarginPowCoef), lodGroupProvider, mapSize, splatSize);
+            _grassLodManager.UpdateLod(new Vector3(0,0,0));
         }
 
         private void generateShells()
@@ -121,7 +87,7 @@ namespace Assets.Grass
             var xgenerateTriangleTurf = billboardGenerator.GenerateTriangleTurf(); //todo : use grass entities set and rotate
             //xgenerateTriangleTurf.Rotation = (MyMathUtils.DegToRad(new Vector3(0, 90, 0)));
             //xgenerateTriangleTurf.Position = new Vector3(2,2,2);
-            return  new GrassEntitiesWithMaterials(xgenerateTriangleTurf.Entities, BillboardMaterial, mesh);
+            return  new GrassEntitiesWithMaterials(xgenerateTriangleTurf.EntitiesAfterTransform, BillboardMaterial, mesh, ContainerType.GameObject);
         }
 
         static float a = 0;
@@ -129,24 +95,26 @@ namespace Assets.Grass
         private static float windStrength = 0;
         private IGrassSplat grassSplat;
         private GrassLodManager _manager;
+        private RootInstanceContainer _rootInstanceContainer;
+        private GrassLodManager _grassLodManager;
 
         private void Update()
         {
             if (Input.GetKey(KeyCode.UpArrow))
             {
-                _grassInstanceContainer.SetGlobalColor("_Color", new Color( a%1.0f, (a +0.5f )%1.0f, (a+0.3f)%1.0f));
+                _rootInstanceContainer.SetGlobalColor("_Color", new Color(a % 1.0f, (a + 0.5f) % 1.0f, (a + 0.3f) % 1.0f));
                 a += 0.1f;
             }
 
             if (Input.GetKey(KeyCode.Q))
             {
-                _grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._BendingStrength, windStrength);
+                _rootInstanceContainer.SetGlobalUniform(GrassShaderUniformName._BendingStrength, windStrength);
                 windStrength += 0.1f;
                 windStrength = Mathf.Clamp01(windStrength);
             }
             if (Input.GetKey(KeyCode.W))
             {
-                _grassInstanceContainer.SetGlobalUniform(GrassShaderUniformName._BendingStrength, windStrength);
+                _rootInstanceContainer.SetGlobalUniform(GrassShaderUniformName._BendingStrength, windStrength);
                 windStrength -= 0.1f;
                 windStrength = Mathf.Clamp01(windStrength);
             }
@@ -165,12 +133,60 @@ namespace Assets.Grass
                 //_manager.UpdateLod(new Vector3(0,0,0));
                 //windStrength = 2;
             }
-           // _grassInstanceContainer.Draw();
+
+            if (Time.frameCount%100 == 0)
+            {
+                _grassLodManager.UpdateLod(CameraGameObject.transform.position);
+            }
+            _rootInstanceContainer.Draw();
         }
 
         Vector4 GetWindVector(float angle)
         {
             return new Vector4((float)Math.Sin(angle), 0, (float)Math.Cos(angle));
+        }
+    }
+
+    internal class LodGroupsProvider : ILodGroupsProvider
+    {
+        private GrassSingleGenerator _grassSingleGenerator;
+        private IEntityPositionProvider _singleGrassUniformPositionProvider;
+        private GrassSingleSettingGenerator _grassSingleSettingGenerator;
+        private IGrassInstanceContainer _grassInstanceContainer;
+        private GrassMeshGenerator _meshGenerator;
+        private Material _grassMaterial;
+
+        public LodGroupsProvider(GrassSingleGenerator grassSingleGenerator, IEntityPositionProvider singleGrassUniformPositionProvider, GrassSingleSettingGenerator grassSingleSettingGenerator, IGrassInstanceContainer grassInstanceContainer, GrassMeshGenerator meshGenerator, Material grassMaterial)
+        {
+            _grassSingleGenerator = grassSingleGenerator;
+            _singleGrassUniformPositionProvider = singleGrassUniformPositionProvider;
+            _grassSingleSettingGenerator = grassSingleSettingGenerator;
+            _grassInstanceContainer = grassInstanceContainer;
+            _meshGenerator = meshGenerator;
+            _grassMaterial = grassMaterial;
+        }
+
+        public LodGroup GenerateLodGroup(MapAreaPosition position, int newLodLevel)
+        {
+            return new LodGroup(
+                new List<LodEntitySplat>
+                {
+                    new LodEntitySplat(position, 
+                        new SingleGrassLodResolver(),
+                        new SingleGrassEntitySplatGenerator(_grassSingleGenerator, _singleGrassUniformPositionProvider, _grassSingleSettingGenerator, _grassInstanceContainer, _meshGenerator, _grassMaterial ),
+                        newLodLevel
+)
+                }, newLodLevel, position );
+        }
+    }
+
+    internal class SingleGrassLodResolver : IEntityLodResolver
+    {
+        // globalLod 0 - 10
+        public int GetEntityLod(int globalLod)
+        {
+            var t = Mathf.InverseLerp(Constants.MIN_GLOBAL_LOD, Constants.MAX_GLOBAL_LOD, globalLod);
+            return (int)Mathf.Round(Mathf.Lerp(Constants.MIN_SINGLE_GRASS_LOD, Constants.MAX_SINGLE_GRASS_LOD, t));
         }
     }
 }

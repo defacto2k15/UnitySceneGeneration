@@ -25,10 +25,11 @@ namespace Assets.Grass
             {
                 var entitiesSet = _tuftGenerator.CreateGrassTuft();
                 placer.Set(entitiesSet);
-                outList.AddRange(entitiesSet.Entities);
+                outList.AddRange(entitiesSet.EntitiesAfterTransform);
             }
 
-            return new GrassEntitiesWithMaterials(outList, material, mesh);
+            //return new GrassEntitiesWithMaterials(outList, material, mesh);
+            return null;
         }
 
         public GrassEntitiesWithMaterials GenerateUniformRectangeSingleGrass(Material material, IGrassPlacer placer, int lodLevel)
@@ -40,9 +41,9 @@ namespace Assets.Grass
             {
                 var entitiesSet = _singleGenerator.CreateSingleGrass();
                 placer.Set(entitiesSet);
-                outList.AddRange(entitiesSet.Entities);
+                outList.AddRange(entitiesSet.EntitiesAfterTransform);
             }
-            return new GrassEntitiesWithMaterials(outList, material, mesh);
+            return null; //new GrassEntitiesWithMaterials(outList, material, mesh);
         }
 
 
@@ -58,10 +59,10 @@ namespace Assets.Grass
                 var triangleTurf = billboardGenerator.GenerateTriangleTurf(); //todo : use grass entities set and rotate
                 triangleTurf.Rotation = (MyMathUtils.DegToRad(new Vector3(0, UnityEngine.Random.Range(0, 360), 0)));
                 placer.Set(triangleTurf);
-                createdEntities.AddRange(triangleTurf.Entities);
+                createdEntities.AddRange(triangleTurf.EntitiesAfterTransform);
             }
 
-            return  new GrassEntitiesWithMaterials(createdEntities, material, mesh);
+            return null; // new GrassEntitiesWithMaterials(createdEntities, material, mesh);
         }
 
         public GrassEntitiesWithMaterials GenerateLineGrass(Material material)
@@ -75,9 +76,9 @@ namespace Assets.Grass
                 var entitiesSet = _singleGenerator.CreateSingleGrass();
                 Vector3 randomNormalizedPos = RandomGrassDistributionGenerator.GenerateRandomPosition();
                 entitiesSet.TranslateBy(new Vector3(i*fullLength/singleCount, 0, 0));
-                outList.AddRange(entitiesSet.Entities);
+                outList.AddRange(entitiesSet.EntitiesAfterTransform);
             }
-            return new GrassEntitiesWithMaterials(outList, material, mesh);
+            return null;//new GrassEntitiesWithMaterials(outList, material, mesh);
         }
     }
 

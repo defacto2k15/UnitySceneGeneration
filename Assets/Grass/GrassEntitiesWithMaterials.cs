@@ -11,12 +11,14 @@ namespace Assets.Grass
         private readonly List<GrassEntity> _entities;
         private readonly Material _material;
         private readonly Mesh _mesh;
+        private readonly ContainerType _containerType;
 
-        public GrassEntitiesWithMaterials(List<GrassEntity> entities, Material material, Mesh mesh)
+        public GrassEntitiesWithMaterials(List<GrassEntity> entities, Material material, Mesh mesh, ContainerType containerType)
         {
             this._entities = entities;
             this._material = material;
             this._mesh = mesh;
+            this._containerType = containerType;
         }
 
         public List<GrassEntity> Entities
@@ -32,6 +34,11 @@ namespace Assets.Grass
         public Mesh Mesh
         {
             get { return _mesh; }
+        }
+
+        public ContainerType ContainerType
+        {
+            get { return _containerType; }
         }
     }
 }

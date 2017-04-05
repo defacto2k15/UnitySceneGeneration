@@ -8,8 +8,8 @@ namespace Assets.Utils
 {
     class MyRange
     {
-        private float _min;
-        private float _max;
+        private readonly float _min;
+        private readonly float _max;
 
         public MyRange(float min, float max)
         {

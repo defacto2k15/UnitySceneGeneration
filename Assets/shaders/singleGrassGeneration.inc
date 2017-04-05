@@ -17,7 +17,7 @@ half3 calculateNormal(half yPos, half zPos ){
 		};
 
 		void grass_vert(inout appdata_full v, out Input o, 
-				half l_BendingStrength, half l_InitialBendingValue, half l_PlantBendingStiffness, half4 l_WindDirection, half4 l_PlantDirection, fixed4 l_Color, half l_RandSeed  ){
+				half l_BendingStrength, half l_InitialBendingValue, half l_PlantBendingStiffness, half4 l_WindDirection, half4 l_PlantDirection, fixed4 l_Color, half l_RandSeed, half distanceScale  ){
 			UNITY_INITIALIZE_OUTPUT(Input, o);
 			o.objectSpacePos = v.vertex.xy;
 
@@ -28,9 +28,9 @@ half3 calculateNormal(half yPos, half zPos ){
 			half yBendStrength = strengths.y;
 
 			
-			v.vertex.z = calculateZ(xBendStrength, l); //forth-back bending
-			v.vertex.y = calculateY(xBendStrength, l); // top-down bending
-			v.vertex.x = calculateX(yBendStrength, v.vertex.x, v.vertex.y);
+			v.vertex.z = calculateZ(xBendStrength, l) * distanceScale; //forth-back bending
+			v.vertex.y = calculateY(xBendStrength, l) * distanceScale; // top-down bending
+			v.vertex.x = calculateX(yBendStrength, v.vertex.x, v.vertex.y) * distanceScale;
 
 			// calculating normals
 			o.normal = v.normal = calculateNormal(v.vertex.y, v.vertex.z);

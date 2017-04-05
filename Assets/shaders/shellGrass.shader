@@ -42,7 +42,7 @@ Shader "Custom/shellGrass" {
 			half3 globalVertexPosition = mul (unity_ObjectToWorld, v.vertex).xyz;
 			globalVertexPosition.y -= _LayerHeight*grassHeight; //todo. At final version height will be changed by normals, so this calculation wont be needed
 
-			o.distanceToCamera = distance(_WorldSpaceCameraPos, globalVertexPosition);
+			o.distanceToCamera = distance(_WorldSpaceCameraPos, globalVertexPosition); 
 		}  
 
 		half3 shellGetBaseColor( half2 pos){

@@ -11,21 +11,27 @@ namespace Assets.Grass
     {
         private readonly List<GrassEntity> _entities;
         private MyTransformTriplet _parentTriplet = new MyTransformTriplet(Vector3.zero, Vector3.zero, Vector3.one);
-        
 
         public GrassEntitiesSet(List<GrassEntity> entities)
         {
             _entities = entities;
         }
 
-        public List<GrassEntity> Entities
+        public List<GrassEntity> EntitiesBeforeTransform
+        {
+            get { return _entities; }
+        } 
+
+        public List<GrassEntity> EntitiesAfterTransform
         {
             get
             {
                 var transformedTriplets = TransformUtils.MakeParentChildTransformations(_parentTriplet,
-                    _entities.Select(c => new MyTransformTriplet(c.Position, c.Rotation, c.Scale)).ToList());
+                    _entities.Select(c => new MyTransformTriplet(
+                       c.Position, 
+                        c.Rotation, c.Scale)).ToList());
 
-                for (var i = 0; i < _entities.Count; i++)
+                for (var i = 0; i < _entities.Count; i++) 
                 {
                     _entities[i].Position = transformedTriplets[i].Position;
                     _entities[i].Rotation = transformedTriplets[i].Rotation;

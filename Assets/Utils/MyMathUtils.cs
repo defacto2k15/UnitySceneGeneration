@@ -21,5 +21,18 @@ namespace Assets.Utils
         public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 eulerAngles) {
             return Quaternion.Euler(eulerAngles) * (point - pivot) + pivot;
         }
+
+        // returns between 0 and 1
+        public static float InvLerp(float min, float max, float value)
+        {
+            Preconditions.Assert(min >= value, string.Format("Min {0} max {1} value {2} E1",min,max,value));
+            Preconditions.Assert(max <= value, string.Format("Min {0} max {1} value {2} E2", min, max, value));
+            return (value - min)/(max - min);
+        }
+
+        public static Vector3 MultiplyMembers(Vector3 inValue, Vector3 multiplier)
+        {
+            return new Vector3( inValue.x * multiplier.x, inValue.y * multiplier.y, inValue.z * multiplier.z);
+        }
     }
 }

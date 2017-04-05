@@ -31,7 +31,7 @@ namespace Assets.Utils
             }
         }
 
-        private static List<GameObject> children = new List<GameObject>(); 
+        private static readonly List<GameObject> children = new List<GameObject>(); 
 
         public static List<GameObject> GetChildren(int count)
         {
